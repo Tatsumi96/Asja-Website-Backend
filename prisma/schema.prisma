@@ -11,6 +11,7 @@ model Student {
   Matricule  Int      @id
   Nom        String
   Prenom     String
+  contact    String
   Mention    String
   Niveau     String
   MotDePasse String
@@ -22,7 +23,8 @@ model Teacher {
   id         Int        @id
   Nom        String
   Prenom     String
-  Status     String
+  contact    String
+  Grade      String
   MotDePasse String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
@@ -32,6 +34,8 @@ model Teacher {
 model Document {
   id        String  @id @default(cuid())
   FileName  String
+  Niveau    String
+  Mention   String
   Teacher   Teacher @relation(fields: [teacherId], references: [id])
   teacherId Int
 }
