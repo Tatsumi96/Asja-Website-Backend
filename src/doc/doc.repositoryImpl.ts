@@ -14,6 +14,8 @@ export class DocPrismaRepository implements DocRepository {
       await this.prisma.document.create({
         data: {
           FileName: doc.fileName,
+          Mention: doc.mention,
+          Niveau: doc.level,
           teacherId: doc.authorId,
         },
       });
