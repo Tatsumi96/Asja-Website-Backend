@@ -35,19 +35,83 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
 
   async register(user: UserEntity): Promise<void> {
     try {
-      await this.prisma.student.create({
-        data: {
-          Matricule: user.matricule,
-          Nom: user.name,
-          Prenom: user.afterName,
-          Mention: user.mention as string,
-          Niveau: user.level as string,
-          MotDePasse: user.password,
-        },
-      });
+      if (user.role == 'Student') {
+        await this.registerStudent(user);
+      } else if (user.role == 'Teacher') {
+        await this.registerTeacher(user);
+      }
     } catch (error) {
       console.error(error);
       throw new Error();
     }
+  }
+
+  async registerStudent(user: UserEntity): Promise<void> {
+    let randomId = this.generateRandomId();
+    let isExist = await this.isStudentIdExist(randomId);
+    while (isExist) {
+      randomId = this.generateRandomId();
+      isExist = await this.isStudentIdExist(randomId);
+    }
+
+    await this.prisma.student.create({
+      data: {
+        Matricule: randomId,
+        Nom: user.name,
+        Prenom: user.afterName,
+        contact: user.contact,
+        Mention: user.mention as string,
+        Niveau: user.level as string,
+        MotDePasse: user.password,
+      },
+    });
+  }
+
+  async isStudentIdExist(randomId: number): Promise<boolean | undefined> {
+    try {
+      const isExist = await this.prisma.student.findUnique({
+        where: { Matricule: randomId },
+      });
+      if (!isExist) return false;
+      return true;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async isTeacherIdExist(randomId: number): Promise<boolean | undefined> {
+    try {
+      const isExist = await this.prisma.teacher.findUnique({
+        where: { id: randomId },
+      });
+      if (!isExist) return false;
+      return true;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  generateRandomId(): number {
+    return Math.floor(1000 + Math.random() * 9000);
+  }
+
+  async registerTeacher(user: UserEntity) {
+    let randomId = this.generateRandomId();
+    let isExist = await this.isTeacherIdExist(randomId);
+    while (isExist) {
+      randomId = this.generateRandomId();
+      isExist = await this.isStudentIdExist(randomId);
+    }
+
+    await this.prisma.teacher.create({
+      data: {
+        id: randomId,
+        Nom: user.name,
+        Prenom: user.afterName,
+        contact: user.contact,
+        Grade: user.grade as string,
+        MotDePasse: user.password,
+      },
+    });
   }
 }
