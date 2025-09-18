@@ -19,7 +19,7 @@ export class AuthService {
   ) {}
 
   async callSignIn(loginData: LoginDto) {
-    const result = await this.authRepo.signIn(loginData.identifier);
+    const result = await this.authRepo.signIn(loginData);
 
     if (result.status == 'failure')
       throw new BadRequestException('Credential not found');
@@ -31,7 +31,7 @@ export class AuthService {
 
     if (!isPasswordMatch) throw new ForbiddenException('Password incorrect');
 
-    const payload = { sub: result.data.identifier };
+    const payload = { sub: result.data.identifier, role: result.data.role };
     const token = await this.jwtService.signAsync(payload, {
       expiresIn: '5m',
       secret: this.config.get('JWT_SECRET'),
