@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { role } from './user.entity';
 
 export class LoginDto {
   @IsNotEmpty()
@@ -10,4 +11,6 @@ export class LoginDto {
   password: string;
 
   name?: string;
+
+  role: role;
 }
