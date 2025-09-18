@@ -24,6 +24,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
             })
           : await this.prisma.teacher.findFirst({
               where: { id: loginData.identifier },
+              select: { MotDePasse: true },
             });
 
       if (!user) throw new UserNotFoundException();
