@@ -6,7 +6,7 @@ import { UserNotFoundException } from './exception';
 import { UserEntity } from './user.entity';
 
 export abstract class AuthPrismaService {
-  abstract signIn(userId: number): Promise<LoginDto>;
+  abstract signIn(loginData: LoginDto): Promise<LoginDto>;
   abstract register(user: UserEntity): Promise<void>;
 }
 
@@ -14,18 +14,24 @@ export abstract class AuthPrismaService {
 export class AuthPrismaServiceImpl implements AuthPrismaService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async signIn(userId: number): Promise<LoginDto> {
+  async signIn(loginData: LoginDto): Promise<LoginDto> {
     try {
-      const user = await this.prisma.student.findFirst({
-        where: { Matricule: userId },
-        select: { MotDePasse: true },
-      });
+      const user =
+        loginData.role == 'Student'
+          ? await this.prisma.student.findFirst({
+              where: { Matricule: loginData.identifier },
+              select: { MotDePasse: true },
+            })
+          : await this.prisma.teacher.findFirst({
+              where: { id: loginData.identifier },
+            });
 
       if (!user) throw new UserNotFoundException();
 
       return {
-        identifier: userId,
+        identifier: loginData.identifier,
         password: user.MotDePasse,
+        role: loginData.role,
       };
     } catch (error) {
       console.error(error);
