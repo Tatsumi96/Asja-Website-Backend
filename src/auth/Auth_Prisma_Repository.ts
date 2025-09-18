@@ -5,7 +5,7 @@ import { failure, Result, success } from '@/core/Result';
 import { LoginDto } from '@/auth/login_Dto';
 import { UserNotFoundException } from './exception';
 import { AuthRepository } from './Auth_repository';
-import { User, UserEntity } from './user.entity';
+import { UserEntity } from './user.entity';
 
 @Injectable()
 export class AuthPrismaRepository implements AuthRepository {
@@ -30,7 +30,7 @@ export class AuthPrismaRepository implements AuthRepository {
     }
   }
 
-  async register(user: User): Promise<Result<void>> {
+  async register(user: UserEntity): Promise<Result<void>> {
     try {
       await this.prisma.student.create({
         data: {
