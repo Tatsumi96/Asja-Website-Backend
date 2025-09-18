@@ -1,0 +1,9 @@
+services:
+  asja-db:
+    image: postgres:14.18
+    ports : 
+      - 5431:5432
+    environment:
+       POSTGRES_USER: asja
+       POSTGRES_PASSWORD: asjauniversity
+       POSTGRES_DB: asjadb
