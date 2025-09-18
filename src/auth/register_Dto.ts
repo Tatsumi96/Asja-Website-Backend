@@ -1,13 +1,12 @@
-import { UserRole } from './user.entity';
+import { role } from './user.entity';
 
 export class RegisterDto {
-  identifier: number;
   name: string;
   afterName: string;
   password: string;
-  role: UserRole;
-
+  contact: string;
+  role: role;
   level?: string;
   mention?: string;
-  status?: string;
+  grade?: string;
 }
