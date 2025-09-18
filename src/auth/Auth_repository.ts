@@ -3,7 +3,7 @@ import { Result } from '@/core/Result';
 import { UserEntity } from './user.entity';
 
 export abstract class AuthRepository {
-  abstract signIn(login: number): Promise<Result<LoginDto>>;
+  abstract signIn(login: LoginDto): Promise<Result<LoginDto>>;
 
   abstract register(user: UserEntity): Promise<Result<void>>;
 

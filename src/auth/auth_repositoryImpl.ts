@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(private service: AuthPrismaService) {}
 
-  async signIn(login: number): Promise<Result<LoginDto>> {
+  async signIn(login: LoginDto): Promise<Result<LoginDto>> {
     try {
       const result = await this.service.signIn(login);
       return success(result);
