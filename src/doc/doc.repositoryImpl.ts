@@ -4,6 +4,7 @@ import { DocRepository, getDocFileInputType } from './doc.repository';
 
 import { Injectable } from '@nestjs/common';
 import { DocPrismaService } from './doc_prisma_service';
+import { DocDto } from './docDto';
 
 @Injectable()
 export class DocRepositoryImpl implements DocRepository {
@@ -18,7 +19,7 @@ export class DocRepositoryImpl implements DocRepository {
     }
   }
 
-  async get(params: getDocFileInputType): Promise<Result<DocEntity[]>> {
+  async get(params: getDocFileInputType): Promise<Result<DocDto[]>> {
     try {
       const docFile = await this.service.get(params);
       return success(docFile);
