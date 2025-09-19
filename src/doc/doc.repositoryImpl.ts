@@ -1,6 +1,6 @@
 import { failure, Result, success } from '@/core/Result';
 import { DocEntity } from './doc.entity';
-import { DocRepository } from './doc.repository';
+import { DocRepository, getDocFileInputType } from './doc.repository';
 
 import { Injectable } from '@nestjs/common';
 import { DocPrismaService } from './doc_prisma_service';
@@ -12,6 +12,16 @@ export class DocRepositoryImpl implements DocRepository {
     try {
       await this.service.save(doc);
       return success(undefined);
+    } catch (error) {
+      console.error(error);
+      return failure(new Error());
+    }
+  }
+
+  async get(params: getDocFileInputType): Promise<Result<DocEntity[]>> {
+    try {
+      const docFile = await this.service.get(params);
+      return success(docFile);
     } catch (error) {
       console.error(error);
       return failure(new Error());
