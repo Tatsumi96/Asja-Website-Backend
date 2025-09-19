@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 
-import { LoginDto } from '@/auth/login_Dto';
+import { LoginDto, LoginReturnType } from '@/auth/login_Dto';
 import { UserNotFoundException } from './exception';
 import { UserEntity } from './user.entity';
 
@@ -14,42 +14,47 @@ export abstract class AuthPrismaService {
 export class AuthPrismaServiceImpl implements AuthPrismaService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async signIn(loginData: LoginDto): Promise<LoginDto> {
-    try {
-      const user =
-        loginData.role == 'Student'
-          ? await this.prisma.student.findFirst({
-              where: { Matricule: loginData.identifier },
-              select: { MotDePasse: true },
-            })
-          : await this.prisma.teacher.findFirst({
-              where: { id: loginData.identifier },
-              select: { MotDePasse: true },
-            });
-
+  async signIn(loginData: LoginDto): Promise<LoginReturnType> {
+    if (loginData.role == 'Student') {
+      const user = await this.prisma.student.findFirst({
+        where: { Matricule: loginData.identifier },
+        select: {
+          MotDePasse: true,
+          Mention: true,
+          Niveau: true,
+        },
+      });
       if (!user) throw new UserNotFoundException();
 
       return {
         identifier: loginData.identifier,
-        password: user.MotDePasse,
+        password: user?.MotDePasse,
+        level: user.Niveau,
+        mention: user.Mention,
         role: loginData.role,
       };
-    } catch (error) {
-      console.error(error);
+    } else if (loginData.role == 'Teacher') {
+      const user = await this.prisma.teacher.findFirst({
+        where: { id: loginData.identifier },
+        select: { MotDePasse: true, Grade: true },
+      });
+      if (!user) throw new UserNotFoundException();
+      return {
+        identifier: loginData.identifier,
+        password: user?.MotDePasse,
+        grade: user.Grade,
+        role: loginData.role,
+      };
+    } else {
       throw new Error();
     }
   }
 
   async register(user: UserEntity): Promise<void> {
-    try {
-      if (user.role == 'Student') {
-        await this.registerStudent(user);
-      } else if (user.role == 'Teacher') {
-        await this.registerTeacher(user);
-      }
-    } catch (error) {
-      console.error(error);
-      throw new Error();
+    if (user.role == 'Student') {
+      await this.registerStudent(user);
+    } else if (user.role == 'Teacher') {
+      await this.registerTeacher(user);
     }
   }
 
@@ -75,27 +80,19 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
   }
 
   async isStudentIdExist(randomId: number): Promise<boolean | undefined> {
-    try {
-      const isExist = await this.prisma.student.findUnique({
-        where: { Matricule: randomId },
-      });
-      if (!isExist) return false;
-      return true;
-    } catch (error) {
-      console.error(error);
-    }
+    const isExist = await this.prisma.student.findUnique({
+      where: { Matricule: randomId },
+    });
+    if (!isExist) return false;
+    return true;
   }
 
   async isTeacherIdExist(randomId: number): Promise<boolean | undefined> {
-    try {
-      const isExist = await this.prisma.teacher.findUnique({
-        where: { id: randomId },
-      });
-      if (!isExist) return false;
-      return true;
-    } catch (error) {
-      console.error(error);
-    }
+    const isExist = await this.prisma.teacher.findUnique({
+      where: { id: randomId },
+    });
+    if (!isExist) return false;
+    return true;
   }
 
   generateRandomId(): number {
