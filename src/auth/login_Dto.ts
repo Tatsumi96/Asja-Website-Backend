@@ -14,3 +14,12 @@ export class LoginDto {
 
   role: role;
 }
+
+export interface LoginReturnType {
+  identifier: number;
+  password: string;
+  level?: string;
+  mention?: string;
+  role: role;
+  grade?: string;
+}
