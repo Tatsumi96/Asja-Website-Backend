@@ -3,15 +3,19 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
   Post,
+  Query,
   Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { DocEntity } from './doc.entity';
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
+import { getDocFileInputType } from './doc.repository';
 
 @Controller('doc')
 export class DocController {
@@ -41,5 +45,20 @@ export class DocController {
         url: `/files/${req.fileData.originalname}`,
       },
     };
+  }
+
+  @Get()
+  async getDocFile(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+  ) {
+    const params: getDocFileInputType = {
+      page,
+      limit,
+      level: 'L2',
+      mention: 'informatique',
+    };
+
+    return this.service.getDocFile(params);
   }
 }
