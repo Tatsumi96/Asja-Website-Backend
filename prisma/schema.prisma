@@ -38,4 +38,5 @@ model Document {
   Mention   String
   Teacher   Teacher @relation(fields: [teacherId], references: [id])
   teacherId Int
+  MegaByte  Int
 }
