@@ -3,10 +3,11 @@ import { DocEntity } from './doc.entity';
 import { getDocFileInputType } from './doc.repository';
 
 import { Injectable } from '@nestjs/common';
+import { DocDto } from './docDto';
 
 export abstract class DocPrismaService {
   abstract save(doc: DocEntity): Promise<void>;
-  abstract get(params: getDocFileInputType): Promise<DocEntity[]>;
+  abstract get(params: getDocFileInputType): Promise<DocDto[]>;
 }
 
 @Injectable()
@@ -20,6 +21,7 @@ export class DocPrismaServiceImpl implements DocPrismaService {
           FileName: doc.fileName,
           Mention: doc.mention,
           Niveau: doc.level,
+          MegaByte: doc.fileSize,
           teacherId: doc.authorId,
         },
       });
@@ -29,7 +31,7 @@ export class DocPrismaServiceImpl implements DocPrismaService {
     }
   }
 
-  async get(params: getDocFileInputType): Promise<DocEntity[]> {
+  async get(params: getDocFileInputType): Promise<DocDto[]> {
     try {
       const result = await this.prisma.document.findMany({
         skip: (params.page - 1) * params.limit,
@@ -37,12 +39,12 @@ export class DocPrismaServiceImpl implements DocPrismaService {
         where: {
           AND: [{ Mention: params.mention }, { Niveau: params.level }],
         },
+        include: { Teacher: { select: { Nom: true } } },
       });
-      const docFile: DocEntity[] = result.map((item) => ({
-        authorId: item.teacherId,
+      const docFile: DocDto[] = result.map((item) => ({
+        author: item.Teacher.Nom,
         fileName: item.FileName,
-        level: item.Niveau,
-        mention: item.Mention,
+        fileSize: item.MegaByte,
         id: item.id,
       }));
 
