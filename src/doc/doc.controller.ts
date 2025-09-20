@@ -1,15 +1,18 @@
-import { FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import {
   BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
+  HttpException,
   HttpStatus,
+  Param,
   ParseIntPipe,
   Post,
   Query,
   Req,
+  Res,
   UseInterceptors,
 } from '@nestjs/common';
 import { DocService } from './doc.service';
@@ -45,6 +48,38 @@ export class DocController {
         url: `/files/${req.fileData.originalname}`,
       },
     };
+  }
+
+  @Get('stream/:filename')
+  async streamFile(
+    @Param('filename') fileName: string,
+    @Query('disposition') disposition: 'attachment' | 'inline' = 'attachment',
+    @Res() reply: FastifyReply,
+  ) {
+    try {
+      const result = await this.service.callGetFile(fileName);
+      reply.header('Content-Type', result.mimeType);
+      reply.header(
+        'Content-Disposition',
+        `${disposition}; filename="${fileName}"`,
+      );
+      reply.send(result.stream);
+    } catch (error) {
+      // Gestion des erreurs spécifiques
+      if (error.code === 'ENOENT') {
+        throw new HttpException('Fichier non trouvé', HttpStatus.NOT_FOUND);
+      } else if (error.code === 'EACCES') {
+        throw new HttpException(
+          'Permissions insuffisantes pour lire le fichier',
+          HttpStatus.FORBIDDEN,
+        );
+      } else {
+        throw new HttpException(
+          'Erreur interne',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
 
   @Get()
