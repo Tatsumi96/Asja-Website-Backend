@@ -3,7 +3,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 
 import { LoginDto, LoginReturnType } from '@/auth/login_Dto';
 import { UserNotFoundException } from './exception';
-import { UserEntity } from './user.entity';
+import { Mention, UserEntity } from './user.entity';
 
 export abstract class AuthPrismaService {
   abstract signIn(loginData: LoginDto): Promise<LoginDto>;
@@ -30,7 +30,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
         identifier: loginData.identifier,
         password: user?.MotDePasse,
         level: user.Niveau,
-        mention: user.Mention,
+        mention: user.Mention as Mention,
         role: loginData.role,
       };
     } else if (loginData.role == 'Teacher') {

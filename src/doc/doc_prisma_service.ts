@@ -18,7 +18,8 @@ export class DocPrismaServiceImpl implements DocPrismaService {
     try {
       await this.prisma.document.create({
         data: {
-          FileName: doc.fileName,
+          Nom: doc.fileName,
+          Titre: doc.lessonTitle,
           Mention: doc.mention,
           Niveau: doc.level,
           MegaByte: doc.fileSize,
@@ -43,11 +44,11 @@ export class DocPrismaServiceImpl implements DocPrismaService {
       });
       const docFile: DocDto[] = result.map((item) => ({
         author: item.Teacher.Nom,
-        fileName: item.FileName,
+        fileName: item.Nom as string,
+        lessonTitle: item.Titre as string,
         fileSize: item.MegaByte,
         id: item.id,
       }));
-
       return docFile;
     } catch (error) {
       console.error(error);
