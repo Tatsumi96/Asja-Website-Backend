@@ -13,23 +13,27 @@ import {
   Query,
   Req,
   Res,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { DocEntity } from './doc.entity';
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
 import { getDocFileInputType } from './doc.repository';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('doc')
 export class DocController {
   constructor(private service: DocService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   @Post('metadata')
   saveDocMetaData(@Body() doc: DocEntity) {
     return this.service.saveDocMetaData(doc);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   @Post('payload')
   @UseInterceptors(new FastifyUploadInterceptor({ dest: './files' }))
@@ -50,6 +54,7 @@ export class DocController {
     };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('stream/:filename')
   async streamFile(
     @Param('filename') fileName: string,
@@ -82,6 +87,7 @@ export class DocController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getDocFile(
     @Query('page', ParseIntPipe) page: number,
