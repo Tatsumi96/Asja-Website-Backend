@@ -33,7 +33,8 @@ model Teacher {
 
 model Document {
   id        String  @id @default(cuid())
-  FileName  String
+  Nom       String
+  Titre     String
   Niveau    String
   Mention   String
   Teacher   Teacher @relation(fields: [teacherId], references: [id])
