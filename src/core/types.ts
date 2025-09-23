@@ -7,8 +7,8 @@ export type Mention =
   | 'DROIT'
   | 'AGRONOMIE'
   | 'ECONOMIE'
-  | 'LANGUE_ET_CULTURE'
-  | 'SCIENCE_DE_LA_TERRE';
+  | 'LANGUE ET CULTURE'
+  | 'SCIENCE DE LA TERRE';
 
 export type Branche =
   | 'GL'

@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Level, Mention, Role } from '@/core/types';
+import { Branche, Level, Mention, Role } from '@/core/types';
 
 export class LoginDto {
   @IsNotEmpty()
@@ -19,6 +19,7 @@ export interface LoginReturnType {
   password: string;
   level?: Level;
   mention?: Mention;
+  branche: Branche;
   role: Role;
   grade?: string;
 }

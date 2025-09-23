@@ -4,7 +4,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { LoginDto, LoginReturnType } from '@/auth/login_Dto';
 import { UserNotFoundException } from './exception';
 import { UserEntity } from './user.entity';
-import { Level, Mention } from '@/core/types';
+import { Branche, Level, Mention } from '@/core/types';
 
 export abstract class AuthPrismaService {
   abstract signIn(loginData: LoginDto): Promise<LoginReturnType>;
@@ -23,6 +23,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
           MotDePasse: true,
           Mention: true,
           Niveau: true,
+          Branche: true,
         },
       });
       if (!user) throw new UserNotFoundException();
@@ -33,6 +34,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
         level: user.Niveau as Level,
         mention: user.Mention as Mention,
         role: loginData.role,
+        branche: user.Branche as Branche,
       };
     } else {
       throw new Error();

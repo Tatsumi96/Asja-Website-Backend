@@ -13,12 +13,17 @@ import {
   Query,
   Req,
   Res,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Request } from 'express';
+
 import { DocService } from './doc.service';
 import { DocEntity } from './doc.entity';
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
 import { getDocFileInputType } from './doc.repository';
+import { Branche, Level, Mention } from '@/core/types';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('doc')
 export class DocController {
@@ -82,17 +87,25 @@ export class DocController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getDocFile(
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
+    @Req() req: Request,
   ) {
+    const userData = req.user as {
+      sub: number;
+      mention: Mention;
+      level: Level;
+      branche: Branche;
+    };
     const params: getDocFileInputType = {
       page,
       limit,
-      level: 'L2',
-      mention: 'INFORMATIQUE',
-      branche: 'GL',
+      level: userData.level,
+      mention: userData.mention,
+      branche: userData.branche,
     };
 
     return this.service.getDocFile(params);
