@@ -1,12 +1,14 @@
 import { Result } from '@/core/Result';
 import { DocEntity } from './doc.entity';
 import { DocDto } from './docDto';
+import { Branche, Level, Mention } from '@/core/types';
 
 export interface getDocFileInputType {
   page: number;
   limit: number;
-  mention: string;
-  level: string;
+  mention: Mention;
+  level: Level;
+  branche: Branche;
 }
 
 export abstract class DocRepository {

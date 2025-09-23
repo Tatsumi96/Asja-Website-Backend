@@ -13,31 +13,20 @@ model Student {
   Prenom     String
   contact    String
   Mention    String
+  Branche    String
   Niveau     String
   MotDePasse String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
 
-model Teacher {
-  id         Int        @id
-  Nom        String
-  Prenom     String
-  contact    String
-  Grade      String
-  MotDePasse String
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  Document   Document[]
-}
-
 model Document {
-  id        String  @id @default(cuid())
-  Nom       String
-  Titre     String
-  Niveau    String
-  Mention   String
-  Teacher   Teacher @relation(fields: [teacherId], references: [id])
-  teacherId Int
-  MegaByte  Int
+  id         String @id @default(cuid())
+  Nom        String
+  Titre      String
+  Niveau     String
+  Professeur String
+  Mention    String
+  Branche    String
+  MegaByte   Int
 }

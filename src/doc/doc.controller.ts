@@ -91,7 +91,8 @@ export class DocController {
       page,
       limit,
       level: 'L2',
-      mention: 'informatique',
+      mention: 'INFORMATIQUE',
+      branche: 'GL',
     };
 
     return this.service.getDocFile(params);

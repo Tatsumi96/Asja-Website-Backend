@@ -3,10 +3,11 @@ import { PrismaService } from '@/prisma/prisma.service';
 
 import { LoginDto, LoginReturnType } from '@/auth/login_Dto';
 import { UserNotFoundException } from './exception';
-import { Mention, UserEntity } from './user.entity';
+import { UserEntity } from './user.entity';
+import { Level, Mention } from '@/core/types';
 
 export abstract class AuthPrismaService {
-  abstract signIn(loginData: LoginDto): Promise<LoginDto>;
+  abstract signIn(loginData: LoginDto): Promise<LoginReturnType>;
   abstract register(user: UserEntity): Promise<void>;
 }
 
@@ -15,7 +16,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
   constructor(private readonly prisma: PrismaService) {}
 
   async signIn(loginData: LoginDto): Promise<LoginReturnType> {
-    if (loginData.role == 'Student') {
+    if (loginData.role == 'User') {
       const user = await this.prisma.student.findFirst({
         where: { Matricule: loginData.identifier },
         select: {
@@ -29,20 +30,8 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
       return {
         identifier: loginData.identifier,
         password: user?.MotDePasse,
-        level: user.Niveau,
+        level: user.Niveau as Level,
         mention: user.Mention as Mention,
-        role: loginData.role,
-      };
-    } else if (loginData.role == 'Teacher') {
-      const user = await this.prisma.teacher.findFirst({
-        where: { id: loginData.identifier },
-        select: { MotDePasse: true, Grade: true },
-      });
-      if (!user) throw new UserNotFoundException();
-      return {
-        identifier: loginData.identifier,
-        password: user?.MotDePasse,
-        grade: user.Grade,
         role: loginData.role,
       };
     } else {
@@ -51,11 +40,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
   }
 
   async register(user: UserEntity): Promise<void> {
-    if (user.role == 'Student') {
-      await this.registerStudent(user);
-    } else if (user.role == 'Teacher') {
-      await this.registerTeacher(user);
-    }
+    if (user.role == 'User') await this.registerStudent(user);
   }
 
   async registerStudent(user: UserEntity): Promise<void> {
@@ -74,6 +59,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
         contact: user.contact,
         Mention: user.mention as string,
         Niveau: user.level as string,
+        Branche: user.branche,
         MotDePasse: user.password,
       },
     });
@@ -87,35 +73,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
     return true;
   }
 
-  async isTeacherIdExist(randomId: number): Promise<boolean | undefined> {
-    const isExist = await this.prisma.teacher.findUnique({
-      where: { id: randomId },
-    });
-    if (!isExist) return false;
-    return true;
-  }
-
   generateRandomId(): number {
     return Math.floor(1000 + Math.random() * 9000);
-  }
-
-  async registerTeacher(user: UserEntity) {
-    let randomId = this.generateRandomId();
-    let isExist = await this.isTeacherIdExist(randomId);
-    while (isExist) {
-      randomId = this.generateRandomId();
-      isExist = await this.isStudentIdExist(randomId);
-    }
-
-    await this.prisma.teacher.create({
-      data: {
-        id: randomId,
-        Nom: user.name,
-        Prenom: user.afterName,
-        contact: user.contact,
-        Grade: user.grade as string,
-        MotDePasse: user.password,
-      },
-    });
   }
 }

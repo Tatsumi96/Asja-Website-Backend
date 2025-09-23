@@ -1,12 +1,4 @@
-export type role = 'Student' | 'Teacher';
-
-export type Mention =
-  | { principale: 'Informatique'; branche: 'DAI' | 'TCO' | 'GI' }
-  | { principale: 'Economie'; branche: 'ED' | 'GCI' }
-  | { principale: 'Droit'; branche: 'Affaire' | 'privé' | 'public' }
-  | { principale: 'Science de la Terre'; branche: 'Mine' | 'Hydro' }
-  | { principale: 'Agronomie'; branche: 'Alimentaire' | 'Elevage' }
-  | 'LEA';
+import { Branche, Level, Mention, Role } from '@/core/types';
 
 export class UserEntity {
   matricule: number;
@@ -14,8 +6,9 @@ export class UserEntity {
   afterName: string;
   password: string;
   contact: string;
-  role: role;
-  mention?: string;
-  level?: string;
+  role: Role;
+  mention?: Mention;
+  level?: Level;
+  branche: Branche;
   grade?: string;
 }
