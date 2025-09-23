@@ -23,7 +23,8 @@ export class DocPrismaServiceImpl implements DocPrismaService {
           Mention: doc.mention,
           Niveau: doc.level,
           MegaByte: doc.fileSize,
-          teacherId: doc.authorId,
+          Professeur: doc.authorName,
+          Branche: doc.branche,
         },
       });
     } catch (error) {
@@ -38,14 +39,17 @@ export class DocPrismaServiceImpl implements DocPrismaService {
         skip: (params.page - 1) * params.limit,
         take: params.limit,
         where: {
-          AND: [{ Mention: params.mention }, { Niveau: params.level }],
+          AND: [
+            { Mention: params.mention },
+            { Niveau: params.level },
+            { Branche: params.branche },
+          ],
         },
-        include: { Teacher: { select: { Nom: true } } },
       });
       const docFile: DocDto[] = result.map((item) => ({
-        author: item.Teacher.Nom,
-        fileName: item.Nom as string,
-        lessonTitle: item.Titre as string,
+        author: item.Professeur as string,
+        fileName: item.Nom,
+        lessonTitle: item.Titre,
         fileSize: item.MegaByte,
         id: item.id,
       }));
