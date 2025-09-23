@@ -31,7 +31,13 @@ export class AuthService {
 
     if (!isPasswordMatch) throw new ForbiddenException('Password incorrect');
 
-    const payload = { sub: result.data.identifier, role: result.data.role };
+    const payload = {
+      sub: result.data.identifier,
+      role: result.data.role,
+      mention: result.data.mention,
+      level: result.data.level,
+      branche: result.data.branche,
+    };
     const token = await this.jwtService.signAsync(payload, {
       expiresIn: '5m',
       secret: this.config.get('JWT_SECRET'),

@@ -1,3 +1,4 @@
+import { Branche, Level, Mention } from '@/core/types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -16,7 +17,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  validate(payload: { sub: number; mention: string; level: string }) {
-    return payload.sub;
+  validate(payload: {
+    sub: number;
+    mention: Mention;
+    level: Level;
+    branche: Branche;
+  }) {
+    return payload;
   }
 }
