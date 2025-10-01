@@ -1,8 +1,9 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { Branche, Level, Mention } from '@/core/types';
+import { UserEntity } from './user.entity';
 
 @Controller('user')
 export class UserController {
@@ -18,5 +19,10 @@ export class UserController {
       branche: Branche;
     };
     return this.service.getData(userData.sub);
+  }
+
+  @Post('signin')
+  async callRegister(@Body() user: UserEntity) {
+    return this.service.callRegister(user);
   }
 }
