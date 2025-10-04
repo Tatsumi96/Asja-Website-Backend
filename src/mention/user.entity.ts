@@ -1,9 +1,9 @@
 import { Branche, Level, Mention, Role } from '@/core/types';
 
 export class UserEntity {
-  matricule: number;
+  matricule?: number;
   name: string;
-  afterName: string;
+  lastName: string;
   password: string;
   contact: string;
   role: Role;

@@ -10,16 +10,10 @@ import {
 import { AuthService } from './auth.service';
 
 import { LoginDto } from './login_Dto';
-import { UserEntity } from './user.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(private service: AuthService) {}
-
-  @Post('signin')
-  async callRegister(@Body() user: UserEntity) {
-    return this.service.callRegister(user);
-  }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')

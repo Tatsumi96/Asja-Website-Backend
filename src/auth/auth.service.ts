@@ -8,7 +8,6 @@ import { LoginDto } from './login_Dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UserEntity } from './user.entity';
 
 @Injectable()
 export class AuthService {
@@ -44,15 +43,5 @@ export class AuthService {
     });
 
     return { status: 'Success', token };
-  }
-
-  async callRegister(user: UserEntity) {
-    const hashPassword = await argon.hash(user.password);
-    const userToInsert: UserEntity = { ...user, password: hashPassword };
-
-    const result = await this.authRepo.register(userToInsert);
-
-    if (result.status == 'failure') throw new BadRequestException();
-    return { status: 'Success' };
   }
 }

@@ -7,26 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Mention {
+  id      String @id @default(cuid())
+  Mention String
+  Branche String
+  Niveau  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  etudiant Student[]
+  document Document[]
+}
+
 model Student {
   Matricule  Int      @id
   Nom        String
   Prenom     String
   contact    String
-  Mention    String
-  Branche    String
-  Niveau     String
   MotDePasse String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  MentionId String
+
+  Classe Mention @relation(fields: [MentionId], references: [id], onDelete: Cascade)
+
+  @@unique([Matricule, MentionId])
 }
 
 model Document {
   id         String @id @default(cuid())
   Nom        String
   Titre      String
-  Niveau     String
   Professeur String
-  Mention    String
-  Branche    String
   MegaByte   Int
+
+  Classe   Mention? @relation(fields: [classeId], references: [id])
+  classeId String?
 }
