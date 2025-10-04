@@ -20,11 +20,15 @@ export class DocPrismaServiceImpl implements DocPrismaService {
         data: {
           Nom: doc.fileName,
           Titre: doc.lessonTitle,
-          Mention: doc.mention,
-          Niveau: doc.level,
           MegaByte: doc.fileSize,
           Professeur: doc.authorName,
-          Branche: doc.branche,
+          Classe: {
+            create: {
+              Branche: doc.branche,
+              Niveau: doc.level,
+              Mention: doc.mention,
+            },
+          },
         },
       });
     } catch (error) {
@@ -38,16 +42,20 @@ export class DocPrismaServiceImpl implements DocPrismaService {
       const result = await this.prisma.document.findMany({
         skip: (params.page - 1) * params.limit,
         take: params.limit,
-        where: {
-          AND: [
-            { Mention: params.mention },
-            { Niveau: params.level },
-            { Branche: params.branche },
-          ],
+        include: {
+          Classe: {
+            where: {
+              AND: [
+                { Mention: params.mention },
+                { Niveau: params.level },
+                { Branche: params.branche },
+              ],
+            },
+          },
         },
       });
       const docFile: DocDto[] = result.map((item) => ({
-        author: item.Professeur as string,
+        author: item.Professeur,
         fileName: item.Nom,
         lessonTitle: item.Titre,
         fileSize: item.MegaByte,
