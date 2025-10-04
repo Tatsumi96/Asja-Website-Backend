@@ -19,9 +19,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
         where: { Matricule: loginData.identifier },
         select: {
           MotDePasse: true,
-          Mention: true,
-          Niveau: true,
-          Branche: true,
+          Classe: { select: { Branche: true, Niveau: true, Mention: true } },
         },
       });
       if (!user) throw new UserNotFoundException();
@@ -29,10 +27,10 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
       return {
         identifier: loginData.identifier,
         password: user?.MotDePasse,
-        level: user.Niveau as Level,
-        mention: user.Mention as Mention,
+        level: user.Classe.Niveau as Level,
+        mention: user.Classe.Mention as Mention,
         role: loginData.role,
-        branche: user.Branche as Branche,
+        branche: user.Classe.Branche as Branche,
       };
     } else {
       throw new Error();
