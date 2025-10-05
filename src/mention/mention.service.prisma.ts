@@ -6,7 +6,7 @@ import { MentionDto } from './mention.dto';
 import { Branche, Level } from '@/core/types';
 
 export abstract class MentionPrismaService {
-  abstract get(): Promise<MentionDto[]>;
+  abstract get(): Promise<MentionDto>;
   abstract register(user: UserEntity): Promise<void>;
 }
 
@@ -67,7 +67,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
     return true;
   }
 
-  async get(): Promise<MentionDto[]> {
+  async get(): Promise<MentionDto> {
     const mentions = await this.prisma.mention.findMany({
       select: {
         Mention: true,
@@ -142,7 +142,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
       {} as { [key: string]: any },
     );
 
-    return [result] as MentionDto[];
+    return result as MentionDto;
   }
 
   async register(user: UserEntity): Promise<void> {
