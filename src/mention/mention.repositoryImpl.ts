@@ -9,7 +9,7 @@ import { MentionDto } from './mention.dto';
 export class MentionRepositoryImpl implements MentionRepository {
   constructor(private service: MentionPrismaService) {}
 
-  async getData(): Promise<Result<MentionDto[]>> {
+  async getData(): Promise<Result<MentionDto>> {
     try {
       const result = await this.service.get();
       return success(result);
