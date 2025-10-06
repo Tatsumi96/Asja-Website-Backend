@@ -7,8 +7,15 @@ import { UserEntity } from './user.entity';
 export class MentionService {
   constructor(private mentionRepository: MentionRepository) {}
 
-  async getData() {
-    const result = await this.mentionRepository.getData();
+  async getMentionData() {
+    const result = await this.mentionRepository.getMentionData();
+    if (result.status == 'failure') throw new BadRequestException();
+
+    return result.data;
+  }
+
+  async getStudentData(page: number, limit: number) {
+    const result = await this.mentionRepository.getStudentData(page, limit);
     if (result.status == 'failure') throw new BadRequestException();
 
     return result.data;

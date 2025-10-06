@@ -1,8 +1,13 @@
 import { Result } from '@/core/Result';
 import { MentionDto } from './mention.dto';
 import { UserEntity } from '@/mention/user.entity';
+import { UserDto } from './user.dto';
 
 export abstract class MentionRepository {
-  abstract getData(): Promise<Result<MentionDto>>;
+  abstract getMentionData(): Promise<Result<MentionDto>>;
+  abstract getStudentData(
+    page: number,
+    limit: number,
+  ): Promise<Result<UserDto[]>>;
   abstract register(user: UserEntity): Promise<Result<void>>;
 }

@@ -4,7 +4,9 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { MentionService } from './mention.service';
@@ -18,8 +20,18 @@ export class MentionController {
   // @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get()
-  async callGetData() {
-    return this.service.getData();
+  async callMentionData() {
+    return this.service.getMentionData();
+  }
+
+  // @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  @Get('student')
+  async callStudentData(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+  ) {
+    return this.service.getStudentData(page, limit);
   }
 
   @Post('register')
