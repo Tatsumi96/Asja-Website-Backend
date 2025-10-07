@@ -8,6 +8,7 @@ import { LoginDto } from './login_Dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Branche, Level, Mention, Role } from '@/core/types';
 
 @Injectable()
 export class AuthService {
@@ -37,11 +38,44 @@ export class AuthService {
       level: result.data.level,
       branche: result.data.branche,
     };
-    const token = await this.jwtService.signAsync(payload, {
-      expiresIn: '5m',
+
+    const token = await this.generateAccessToken(payload);
+    return { status: 'Success', token, payload };
+  }
+
+  async generateAccessToken(payload: {
+    sub: number;
+    role: Role;
+    mention: Mention | undefined;
+    level: Level | undefined;
+    branche: Branche;
+  }): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      expiresIn: '15m',
       secret: this.config.get('JWT_SECRET'),
     });
+  }
 
-    return { status: 'Success', token };
+  async generateRefreshToken(payload: {
+    sub: number;
+    role: Role;
+    mention: Mention | undefined;
+    level: Level | undefined;
+    branche: Branche;
+  }): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      expiresIn: '7d',
+      secret: this.config.get('JWT_SECRET'),
+    });
+  }
+
+  async verifyToken(token: string): Promise<{
+    sub: number;
+    role: Role;
+    mention: Mention | undefined;
+    level: Level | undefined;
+    branche: Branche;
+  }> {
+    return this.jwtService.decode(token);
   }
 }
