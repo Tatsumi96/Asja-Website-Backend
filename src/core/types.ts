@@ -24,3 +24,5 @@ export type Branche =
   | 'PRODUCTION VEGETALE'
   | 'PRODUCTION ANIMAL'
   | 'COMMUN';
+
+export type Tranche = 'Premier' | 'Deuxieme' | 'Troisieme';
