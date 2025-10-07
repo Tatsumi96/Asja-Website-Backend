@@ -227,6 +227,12 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
         where: { studentMatricule: student.Matricule },
         select: { Troisieme: true },
       });
+
+      const trancheId = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { id: true },
+      });
+
       mentionStudent.push({
         name: student.Nom,
         lastName: student.Prenom,
@@ -236,9 +242,10 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
         contact: student.contact,
         identifier: student.Matricule,
         imageUrl: student.filePictureName as string,
-        trancheOne: trancheOne?.Premier as boolean,
-        trancheTwo: trancheTwo?.Deuxieme as boolean,
-        trancheThree: trancheThree?.Troisieme as boolean,
+        trancheId: trancheId?.id as string,
+        Premier: trancheOne?.Premier as boolean,
+        Deuxieme: trancheTwo?.Deuxieme as boolean,
+        Troisieme: trancheThree?.Troisieme as boolean,
       });
     }
 
