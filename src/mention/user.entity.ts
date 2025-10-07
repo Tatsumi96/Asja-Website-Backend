@@ -11,7 +11,8 @@ export class UserEntity {
   level?: Level;
   branche: Branche;
   grade?: string;
-  trancheOne: boolean;
-  trancheTwo: boolean;
-  trancheThree: boolean;
+  Premier: boolean;
+  Deuxieme: boolean;
+  Troisieme: boolean;
+  fileName: string;
 }

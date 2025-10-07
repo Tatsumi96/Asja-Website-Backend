@@ -1,11 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import * as argon from 'argon2';
 import { MentionRepository } from './mention.repository';
 import { UserEntity } from './user.entity';
+import { FileRepository } from './fileRepository';
+import { fileReturnedType } from './file_repositoryImpl';
 
 @Injectable()
 export class MentionService {
-  constructor(private mentionRepository: MentionRepository) {}
+  constructor(
+    private mentionRepository: MentionRepository,
+    private fileRepository: FileRepository<fileReturnedType>,
+  ) {}
 
   async getMentionData() {
     const result = await this.mentionRepository.getMentionData();
@@ -29,5 +38,12 @@ export class MentionService {
 
     if (result.status == 'failure') throw new BadRequestException();
     return { status: 'Success' };
+  }
+
+  async callGetFile(fileName: string) {
+    const result = await this.fileRepository.get(fileName);
+    if (result.status == 'failure') throw new ForbiddenException();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    return { mimeType: result.data.mimetype, stream: result.data.file };
   }
 }

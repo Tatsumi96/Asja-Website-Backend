@@ -9,6 +9,8 @@ import { MentionRepository } from './mention.repository';
 import { MentionRepositoryImpl } from './mention.repositoryImpl';
 import { MentionService } from './mention.service';
 import { MentionController } from './mention.controller';
+import { FileRepository } from './fileRepository';
+import { FileRepositoryImpl } from './file_repositoryImpl';
 
 @Module({
   imports: [PrismaModule],
@@ -17,6 +19,7 @@ import { MentionController } from './mention.controller';
     MentionService,
     { provide: MentionRepository, useClass: MentionRepositoryImpl },
     { provide: MentionPrismaService, useClass: MentionPrismaServiceImpl },
+    { provide: FileRepository, useClass: FileRepositoryImpl },
   ],
 })
 export class MentionModule {}

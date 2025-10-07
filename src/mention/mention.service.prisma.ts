@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
@@ -174,11 +172,12 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
             Nom: user.name,
             Prenom: user.lastName,
             MotDePasse: user.password,
+            filePictureName: user.fileName,
             Tranche: {
               create: {
-                Premier: user.trancheOne,
-                Deuxieme: user.trancheTwo,
-                Troisieme: user.trancheThree,
+                Premier: user.Premier,
+                Deuxieme: user.Deuxieme,
+                Troisieme: user.Troisieme,
               },
             },
           },
