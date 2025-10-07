@@ -46,6 +46,4 @@ export class FileRepositoryImpl implements FileRepository<fileReturnedType> {
       }
     }
   }
-
-  async save(): Promise<void> {}
 }
