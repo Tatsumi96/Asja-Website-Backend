@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 
 import { UserEntity } from './user.entity';
 import { MentionDto } from './mention.dto';
-import { Branche, Level } from '@/core/types';
+import { Branche, Level, Mention } from '@/core/types';
+import { UserDto } from './user.dto';
 
 export abstract class MentionPrismaService {
-  abstract get(): Promise<MentionDto>;
+  abstract getMentionData(): Promise<MentionDto>;
+  abstract getStudentData(page: number, limit: number): Promise<UserDto[]>;
+
   abstract register(user: UserEntity): Promise<void>;
+  abstract deleteStudent(id: string): Promise<void>;
 }
 
 @Injectable()
@@ -67,7 +72,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
     return true;
   }
 
-  async get(): Promise<MentionDto> {
+  async getMentionData(): Promise<MentionDto> {
     const mentions = await this.prisma.mention.findMany({
       select: {
         Mention: true,
@@ -120,7 +125,6 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
                   );
 
                   if (branchStudents.length > 0) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     levelData[formattedBranche] = {
                       studentNumber: branchStudents.reduce(
                         (sum, item) => sum + item._count.etudiant,
@@ -169,6 +173,14 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
             Nom: user.name,
             Prenom: user.lastName,
             MotDePasse: user.password,
+            filePictureName: user.fileName,
+            Tranche: {
+              create: {
+                Premier: user.Premier,
+                Deuxieme: user.Deuxieme,
+                Troisieme: user.Troisieme,
+              },
+            },
           },
         },
       },
@@ -185,5 +197,70 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
 
   generateRandomId(): number {
     return Math.floor(1000 + Math.random() * 9000);
+  }
+
+  async getStudentData(page: number, limit: number): Promise<UserDto[]> {
+    const resultStudent = await this.prisma.student.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        Nom: true,
+        Prenom: true,
+        contact: true,
+        Matricule: true,
+        filePictureName: true,
+        Classe: { select: { Mention: true, Niveau: true, Branche: true } },
+      },
+    });
+    const mentionStudent: UserDto[] = [];
+
+    for (const student of resultStudent) {
+      const trancheOne = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Premier: true },
+      });
+      const trancheTwo = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Deuxieme: true },
+      });
+      const trancheThree = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Troisieme: true },
+      });
+
+      const trancheId = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { id: true },
+      });
+
+      const mentionId = await this.prisma.student.findFirst({
+        where: { Matricule: student.Matricule },
+        select: { MentionId: true },
+      });
+
+      mentionStudent.push({
+        name: student.Nom,
+        lastName: student.Prenom,
+        branche: student.Classe.Branche as Branche,
+        level: student.Classe.Niveau as Level,
+        mention: student.Classe.Mention as Mention,
+        contact: student.contact,
+        identifier: student.Matricule,
+        imageUrl: student.filePictureName as string,
+        mentionId: mentionId?.MentionId as string,
+        trancheId: trancheId?.id as string,
+        Premier: trancheOne?.Premier as boolean,
+        Deuxieme: trancheTwo?.Deuxieme as boolean,
+        Troisieme: trancheThree?.Troisieme as boolean,
+      });
+    }
+
+    return mentionStudent;
+  }
+
+  async deleteStudent(id: string): Promise<void> {
+    await this.prisma.mention.delete({
+      where: { id },
+    });
   }
 }

@@ -21,19 +21,32 @@ model Mention {
 }
 
 model Student {
-  Matricule  Int      @id
-  Nom        String
-  Prenom     String
-  contact    String
-  MotDePasse String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  Matricule       Int      @id
+  Nom             String
+  Prenom          String
+  contact         String
+  MotDePasse      String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  filePictureName String?
 
   MentionId String
 
-  Classe Mention @relation(fields: [MentionId], references: [id], onDelete: Cascade)
+  Classe  Mention   @relation(fields: [MentionId], references: [id], onDelete: Cascade)
+  Tranche Tranche[]
 
   @@unique([Matricule, MentionId])
+}
+
+model Tranche {
+  id               String   @id @default(cuid())
+  Student          Student  @relation(fields: [studentMatricule], references: [Matricule], onDelete: Cascade)
+  Premier          Boolean  @default(false)
+  Deuxieme         Boolean  @default(false)
+  Troisieme        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  studentMatricule Int
 }
 
 model Document {

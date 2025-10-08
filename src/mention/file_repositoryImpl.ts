@@ -12,7 +12,7 @@ export interface fileReturnedType {
 }
 
 export class FileRepositoryImpl implements FileRepository<fileReturnedType> {
-  private basePath = join(process.cwd(), 'files');
+  private basePath = join(process.cwd(), 'student_pictures');
 
   async get(fileName: string): Promise<Result<fileReturnedType>> {
     if (fileName.includes('..') || fileName.includes('/')) {

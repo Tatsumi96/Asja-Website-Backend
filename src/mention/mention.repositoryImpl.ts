@@ -4,14 +4,15 @@ import { Injectable } from '@nestjs/common';
 import { UserEntity } from './user.entity';
 import { MentionRepository } from './mention.repository';
 import { MentionDto } from './mention.dto';
+import { UserDto } from './user.dto';
 
 @Injectable()
 export class MentionRepositoryImpl implements MentionRepository {
   constructor(private service: MentionPrismaService) {}
 
-  async getData(): Promise<Result<MentionDto>> {
+  async getMentionData(): Promise<Result<MentionDto>> {
     try {
-      const result = await this.service.get();
+      const result = await this.service.getMentionData();
       return success(result);
     } catch (error) {
       console.error(error);
@@ -22,6 +23,29 @@ export class MentionRepositoryImpl implements MentionRepository {
   async register(user: UserEntity): Promise<Result<void>> {
     try {
       await this.service.register(user);
+      return success(undefined);
+    } catch (error) {
+      console.error(error);
+      return failure(new Error());
+    }
+  }
+
+  async getStudentData(
+    page: number,
+    limit: number,
+  ): Promise<Result<UserDto[]>> {
+    try {
+      const result = await this.service.getStudentData(page, limit);
+      return success(result);
+    } catch (error) {
+      console.error(error);
+      return failure(new Error());
+    }
+  }
+
+  async deleteStudent(id: string): Promise<Result<void>> {
+    try {
+      await this.service.deleteStudent(id);
       return success(undefined);
     } catch (error) {
       console.error(error);

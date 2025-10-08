@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { DocModule } from './doc/doc.module';
 import { UserModule } from './user/user.module';
 import { MentionModule } from './mention/mention.module';
+import { TrancheModule } from './tranche/tranche.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MentionModule } from './mention/mention.module';
     DocModule,
     UserModule,
     MentionModule,
+    TrancheModule,
   ],
   controllers: [],
 })

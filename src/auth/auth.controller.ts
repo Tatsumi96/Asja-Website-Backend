@@ -1,15 +1,18 @@
 import { FastifyReply } from 'fastify';
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 import { LoginDto } from './login_Dto';
+import { FastifyRequest } from 'fastify/types/request';
 
 @Controller('auth')
 export class AuthController {
@@ -18,17 +21,73 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async signIn(@Body() loginData: LoginDto, @Res() reply: FastifyReply) {
-    const { status, token } = await this.service.callSignIn(loginData);
+    const { status, token, payload } = await this.service.callSignIn(loginData);
+    const refreshToken = await this.service.generateRefreshToken(payload);
+
+    const MINUTE_EXPIRATION = 15 * 60;
+    const DAYS_EXPIRATION = 7 * 24 * 60 * 60;
 
     reply.setCookie('access_token', token, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
       path: '/',
-      maxAge: 24 * 60 * 60,
+      maxAge: MINUTE_EXPIRATION,
       domain: 'localhost',
     });
 
-    return reply.send({ status, token });
+    reply.setCookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: DAYS_EXPIRATION,
+      domain: 'localhost',
+    });
+
+    return reply.send({ status });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  async refresh(
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    const refreshToken: string | undefined = req.cookies['refresh_token'];
+    if (!refreshToken) throw new BadRequestException('Refresh token not found');
+
+    const result = await this.service.verifyToken(refreshToken);
+
+    const payload = {
+      sub: result.sub,
+      role: result.role,
+      mention: result.mention,
+      level: result.level,
+      branche: result.branche,
+    };
+    const newToken = await this.service.generateAccessToken(payload);
+    const newRefreshToken = await this.service.generateRefreshToken(payload);
+
+    const MINUTE_EXPIRATION = 15 * 60;
+    const DAYS_EXPIRATION = 7 * 24 * 60 * 60;
+
+    reply.setCookie('access_token', newToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: MINUTE_EXPIRATION,
+      domain: 'localhost',
+    });
+
+    reply.setCookie('refresh_token', newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: DAYS_EXPIRATION,
+      domain: 'localhost',
+    });
   }
 }
