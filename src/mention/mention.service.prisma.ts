@@ -13,6 +13,8 @@ export abstract class MentionPrismaService {
 
   abstract register(user: UserEntity): Promise<void>;
   abstract deleteStudent(id: string): Promise<void>;
+
+  abstract searchStudent(query: string): Promise<UserDto[]>;
 }
 
 @Injectable()
@@ -262,5 +264,74 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
     await this.prisma.mention.delete({
       where: { id },
     });
+  }
+
+  async searchStudent(query: string): Promise<UserDto[]> {
+    const result: {
+      Matricule: number;
+      Nom: string;
+      Prenom: string;
+      contact: string;
+      filePictureName: string;
+      MentionId: string;
+    }[] = await this.prisma.$queryRawUnsafe(
+      `SELECT "Matricule","Nom","Prenom","contact","filePictureName","MentionId" FROM "Student"
+     WHERE "Nom" ILIKE '%' || $1 || '%'
+        OR "Prenom" ILIKE '%' || $1 || '%'
+        OR SIMILARITY("Nom", $1) > 0.3 
+        OR SIMILARITY("Prenom", $1) > 0.3
+     ORDER BY GREATEST(SIMILARITY("Nom", $1), SIMILARITY("Prenom", $1)) DESC
+     LIMIT 5;`,
+      query,
+    );
+
+    const data: UserDto[] = [];
+
+    for (const student of result) {
+      const resultMention = await this.prisma.mention.findFirst({
+        where: { id: student.MentionId },
+        select: {
+          Branche: true,
+          Niveau: true,
+          Mention: true,
+        },
+      });
+
+      const trancheOne = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Premier: true },
+      });
+      const trancheTwo = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Deuxieme: true },
+      });
+      const trancheThree = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Troisieme: true },
+      });
+
+      const trancheId = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { id: true },
+      });
+
+      data.push({
+        name: student.Nom,
+        lastName: student.Prenom,
+        branche: resultMention?.Branche as Branche,
+        level: resultMention?.Niveau as Level,
+        mention: resultMention?.Mention as Mention,
+        contact: student.contact,
+        identifier: student.Matricule,
+        imageUrl: student.filePictureName,
+        mentionId: student.MentionId,
+        trancheId: trancheId?.id as string,
+        Premier: trancheOne?.Premier as boolean,
+        Deuxieme: trancheTwo?.Deuxieme as boolean,
+        Troisieme: trancheThree?.Troisieme as boolean,
+      });
+    }
+
+    return data;
   }
 }

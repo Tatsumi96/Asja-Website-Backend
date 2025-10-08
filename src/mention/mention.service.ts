@@ -30,6 +30,14 @@ export class MentionService {
     return result.data;
   }
 
+  async searchStudent(query: string) {
+    const result = await this.mentionRepository.searchStudent(query);
+    if (result.status == 'failure') throw new BadRequestException();
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return result.data;
+  }
+
   async callRegister(user: UserEntity) {
     const hashPassword = await argon.hash(user.password);
     const userToInsert: UserEntity = { ...user, password: hashPassword };

@@ -52,4 +52,14 @@ export class MentionRepositoryImpl implements MentionRepository {
       return failure(new Error());
     }
   }
+
+  async searchStudent(query: string): Promise<Result<UserDto[]>> {
+    try {
+      const result: any = await this.service.searchStudent(query);
+      return success(result);
+    } catch (error) {
+      console.error(error);
+      return failure(new Error());
+    }
+  }
 }

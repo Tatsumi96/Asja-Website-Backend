@@ -12,4 +12,6 @@ export abstract class MentionRepository {
   abstract register(user: UserEntity): Promise<Result<void>>;
 
   abstract deleteStudent(id: string): Promise<Result<void>>;
+
+  abstract searchStudent(query: string): Promise<Result<UserDto[]>>;
 }

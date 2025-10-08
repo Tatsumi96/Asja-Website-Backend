@@ -44,6 +44,12 @@ export class MentionController {
     return this.service.getStudentData(page, limit);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Get('student/:name')
+  async callSearchStudent(@Query('name') query: string) {
+    return this.service.searchStudent(query);
+  }
+
   @Post('register')
   async callRegister(@Body() user: UserEntity) {
     return this.service.callRegister(user);
