@@ -42,4 +42,14 @@ export class MentionRepositoryImpl implements MentionRepository {
       return failure(new Error());
     }
   }
+
+  async deleteStudent(id: string): Promise<Result<void>> {
+    try {
+      await this.service.deleteStudent(id);
+      return success(undefined);
+    } catch (error) {
+      console.error(error);
+      return failure(new Error());
+    }
+  }
 }

@@ -40,7 +40,7 @@ model Student {
 
 model Tranche {
   id               String   @id @default(cuid())
-  Student          Student  @relation(fields: [studentMatricule], references: [Matricule])
+  Student          Student  @relation(fields: [studentMatricule], references: [Matricule], onDelete: Cascade)
   Premier          Boolean  @default(false)
   Deuxieme         Boolean  @default(false)
   Troisieme        Boolean  @default(false)

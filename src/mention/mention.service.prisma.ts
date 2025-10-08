@@ -12,6 +12,7 @@ export abstract class MentionPrismaService {
   abstract getStudentData(page: number, limit: number): Promise<UserDto[]>;
 
   abstract register(user: UserEntity): Promise<void>;
+  abstract deleteStudent(id: string): Promise<void>;
 }
 
 @Injectable()
@@ -232,6 +233,11 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
         select: { id: true },
       });
 
+      const mentionId = await this.prisma.student.findFirst({
+        where: { Matricule: student.Matricule },
+        select: { MentionId: true },
+      });
+
       mentionStudent.push({
         name: student.Nom,
         lastName: student.Prenom,
@@ -241,6 +247,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
         contact: student.contact,
         identifier: student.Matricule,
         imageUrl: student.filePictureName as string,
+        mentionId: mentionId?.MentionId as string,
         trancheId: trancheId?.id as string,
         Premier: trancheOne?.Premier as boolean,
         Deuxieme: trancheTwo?.Deuxieme as boolean,
@@ -249,5 +256,11 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
     }
 
     return mentionStudent;
+  }
+
+  async deleteStudent(id: string): Promise<void> {
+    await this.prisma.mention.delete({
+      where: { id },
+    });
   }
 }

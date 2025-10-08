@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -96,5 +97,11 @@ export class MentionController {
         );
       }
     }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Delete(':id')
+  async deleteStudent(@Query('id') id: string) {
+    return this.service.deleteStudent(id);
   }
 }

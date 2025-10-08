@@ -10,4 +10,6 @@ export abstract class MentionRepository {
     limit: number,
   ): Promise<Result<UserDto[]>>;
   abstract register(user: UserEntity): Promise<Result<void>>;
+
+  abstract deleteStudent(id: string): Promise<Result<void>>;
 }

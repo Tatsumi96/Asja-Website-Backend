@@ -46,4 +46,9 @@ export class MentionService {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return { mimeType: result.data.mimetype, stream: result.data.file };
   }
+
+  async deleteStudent(id: string) {
+    const result = await this.mentionRepository.deleteStudent(id);
+    if (result.status == 'failure') throw new ForbiddenException();
+  }
 }
