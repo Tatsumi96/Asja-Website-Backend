@@ -5,6 +5,7 @@ import { UserEntity } from './user.entity';
 import { MentionRepository } from './mention.repository';
 import { MentionDto } from './mention.dto';
 import { UserDto } from './user.dto';
+import { RegisterReturnType } from './registerReturnType';
 
 @Injectable()
 export class MentionRepositoryImpl implements MentionRepository {
@@ -20,10 +21,10 @@ export class MentionRepositoryImpl implements MentionRepository {
     }
   }
 
-  async register(user: UserEntity): Promise<Result<void>> {
+  async register(user: UserEntity): Promise<Result<RegisterReturnType>> {
     try {
-      await this.service.register(user);
-      return success(undefined);
+      const result = await this.service.register(user);
+      return success(result);
     } catch (error) {
       console.error(error);
       return failure(new Error());
