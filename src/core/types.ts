@@ -26,3 +26,5 @@ export type Branche =
   | 'COMMUN';
 
 export type Tranche = 'Premier' | 'Deuxieme' | 'Troisieme';
+
+export type Actions = 'Creation' | 'Suppression' | 'Modification';
