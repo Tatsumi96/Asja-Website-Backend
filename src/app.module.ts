@@ -7,6 +7,7 @@ import { DocModule } from './doc/doc.module';
 import { UserModule } from './user/user.module';
 import { MentionModule } from './mention/mention.module';
 import { TrancheModule } from './tranche/tranche.module';
+import { LogModule } from './log/log.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TrancheModule } from './tranche/tranche.module';
     UserModule,
     MentionModule,
     TrancheModule,
+    LogModule,
   ],
   controllers: [],
 })
