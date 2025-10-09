@@ -28,9 +28,9 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
         PROCESSUEL: 'PROCESSUEL',
       },
       INFORMATIQUE: {
-        TCO: 'TCO',
-        GL: 'GL',
-        GI: 'GI',
+        TELECOMMUNICATION: 'TELECOMMUNICATION',
+        'GENIE LOGICIEL': 'GENIE_LOGICIEL',
+        'GENIE INDUSTRIEL': 'GENIE_INDUSTRIEL',
       },
       'SCIENCE DE LA TERRE': {
         HYDROGEOLOGIE: 'HYDROGEOLOGIE',
@@ -53,9 +53,9 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
 
   private shouldIncludeBranch(branche: string, level: Level): boolean {
     const l3PlusBranches: Branche[] = [
-      'GL',
-      'GI',
-      'TCO',
+      'GENIE LOGICIEL',
+      'GENIE INDUSTRIEL',
+      'TELECOMMUNICATION',
       'AFFAIRES',
       'PROCESSUEL',
       'HYDROGEOLOGIE',
