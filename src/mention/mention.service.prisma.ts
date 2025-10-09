@@ -6,12 +6,13 @@ import { UserEntity } from './user.entity';
 import { MentionDto } from './mention.dto';
 import { Branche, Level, Mention } from '@/core/types';
 import { UserDto } from './user.dto';
+import { RegisterReturnType } from './registerReturnType';
 
 export abstract class MentionPrismaService {
   abstract getMentionData(): Promise<MentionDto>;
   abstract getStudentData(page: number, limit: number): Promise<UserDto[]>;
 
-  abstract register(user: UserEntity): Promise<void>;
+  abstract register(user: UserEntity): Promise<RegisterReturnType>;
   abstract deleteStudent(id: string): Promise<void>;
 
   abstract searchStudent(query: string): Promise<UserDto[]>;
@@ -151,11 +152,11 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
     return result as MentionDto;
   }
 
-  async register(user: UserEntity): Promise<void> {
-    if (user.role == 'User') await this.registerStudent(user);
+  async register(user: UserEntity): Promise<RegisterReturnType> {
+    return this.registerStudent(user);
   }
 
-  async registerStudent(user: UserEntity): Promise<void> {
+  async registerStudent(user: UserEntity): Promise<RegisterReturnType> {
     let randomId = this.generateRandomId();
     let isExist = await this.isStudentIdExist(randomId);
     while (isExist) {
@@ -163,7 +164,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
       isExist = await this.isStudentIdExist(randomId);
     }
 
-    await this.prisma.mention.create({
+    const result = await this.prisma.mention.create({
       data: {
         Branche: user.branche,
         Niveau: user.level as string,
@@ -186,7 +187,21 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
           },
         },
       },
+      select: {
+        id: true,
+      },
     });
+
+    const trancheId = await this.prisma.tranche.findFirst({
+      where: { studentMatricule: randomId },
+      select: { id: true },
+    });
+
+    return {
+      mentionId: result.id,
+      trancheId: trancheId?.id as string,
+      identifier: randomId,
+    };
   }
 
   async isStudentIdExist(randomId: number): Promise<boolean | undefined> {

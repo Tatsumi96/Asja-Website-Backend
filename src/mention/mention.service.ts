@@ -34,7 +34,6 @@ export class MentionService {
     const result = await this.mentionRepository.searchStudent(query);
     if (result.status == 'failure') throw new BadRequestException();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return result.data;
   }
 
@@ -45,7 +44,7 @@ export class MentionService {
     const result = await this.mentionRepository.register(userToInsert);
 
     if (result.status == 'failure') throw new BadRequestException();
-    return { status: 'Success' };
+    return result.data;
   }
 
   async callGetFile(fileName: string) {

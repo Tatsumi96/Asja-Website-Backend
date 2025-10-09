@@ -6,8 +6,8 @@ export interface UserDto {
   name: string;
   lastName: string;
   contact: string;
-  mention?: Mention;
-  level?: Level;
+  mention: Mention;
+  level: Level;
   branche: Branche;
   mentionId: string;
   trancheId: string;
