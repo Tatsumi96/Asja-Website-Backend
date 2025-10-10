@@ -37,8 +37,10 @@ export class FileRepositoryImpl implements FileRepository<fileReturnedType> {
       return success({ mimetype: contentType, file: stream });
     } catch (error) {
       // Gestion des erreurs spécifiques
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === 'ENOENT') {
         throw new Error();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       } else if (error.code === 'EACCES') {
         throw new Error();
       } else {

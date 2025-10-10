@@ -11,9 +11,9 @@ export type Mention =
   | 'SCIENCE DE LA TERRE';
 
 export type Branche =
-  | 'GL'
-  | 'GI'
-  | 'TCO'
+  | 'GENIE LOGICIEL'
+  | 'GENIE INDUSTRIEL'
+  | 'TELECOMMUNICATION'
   | 'AFFAIRES'
   | 'PROCESSUEL'
   | 'HYDROGEOLOGIE'
@@ -26,3 +26,5 @@ export type Branche =
   | 'COMMUN';
 
 export type Tranche = 'Premier' | 'Deuxieme' | 'Troisieme';
+
+export type Action = 'Creation' | 'Suppression' | 'Modification';

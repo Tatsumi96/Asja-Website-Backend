@@ -30,6 +30,13 @@ export class MentionService {
     return result.data;
   }
 
+  async searchStudent(query: string) {
+    const result = await this.mentionRepository.searchStudent(query);
+    if (result.status == 'failure') throw new BadRequestException();
+
+    return result.data;
+  }
+
   async callRegister(user: UserEntity) {
     const hashPassword = await argon.hash(user.password);
     const userToInsert: UserEntity = { ...user, password: hashPassword };
@@ -37,7 +44,7 @@ export class MentionService {
     const result = await this.mentionRepository.register(userToInsert);
 
     if (result.status == 'failure') throw new BadRequestException();
-    return { status: 'Success' };
+    return result.data;
   }
 
   async callGetFile(fileName: string) {
