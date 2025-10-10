@@ -20,9 +20,9 @@ export class LogRepositoryImpl implements LogRepository {
     }
   }
 
-  async read(): Promise<Result<LogEntity[]>> {
+  async read(page: number, limit: number): Promise<Result<LogEntity[]>> {
     try {
-      const logs = await this.service.read();
+      const logs = await this.service.read(page, limit);
       return success(logs);
     } catch (error) {
       console.error(error);

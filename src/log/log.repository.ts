@@ -3,5 +3,5 @@ import { LogEntity } from './log.entity';
 
 export abstract class LogRepository {
   abstract write(log: LogEntity): Promise<Result<void>>;
-  abstract read(): Promise<Result<LogEntity[]>>;
+  abstract read(page: number, limit: number): Promise<Result<LogEntity[]>>;
 }

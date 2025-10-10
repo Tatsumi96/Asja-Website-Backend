@@ -6,7 +6,7 @@ import { join } from 'path';
 
 export abstract class LogServiceFs {
   abstract write(log: LogEntity): Promise<void>;
-  abstract read(): Promise<LogEntity[]>;
+  abstract read(page: number, limit: number): Promise<LogEntity[]>;
 }
 
 @Injectable()
@@ -38,16 +38,25 @@ export class LogServiceFsImpl implements LogServiceFs {
       }
     }
   }
-
-  async read(): Promise<LogEntity[]> {
+  async read(page: number = 1, limit: number = 3): Promise<LogEntity[]> {
     try {
       const data = await fsPromises.readFile(this.logFilePath, 'utf-8');
-      if (!data.trim()) throw new Error();
+
+      if (!data.trim()) {
+        return []; // fichier vide = aucun log
+      }
+
       const logs: LogEntity[] = JSON.parse(data) as LogEntity[];
-      return logs;
+
+      const start = (page - 1) * limit;
+      const end = start + limit;
+
+      const logsToReturn = logs.slice(start, end);
+
+      return logsToReturn;
     } catch (error) {
-      console.error(error);
-      throw new Error();
+      console.error('Erreur lors de la lecture du fichier de logs :', error);
+      throw new Error('Impossible de lire les logs.');
     }
   }
 }

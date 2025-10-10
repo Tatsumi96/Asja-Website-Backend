@@ -5,8 +5,8 @@ import { LogRepository } from './log.repository';
 export class LogService {
   constructor(private logRepo: LogRepository) {}
 
-  async logs() {
-    const result = await this.logRepo.read();
+  async logs(page: number, limit: number) {
+    const result = await this.logRepo.read(page, limit);
     if (result.status == 'failure') throw new BadRequestException();
 
     return result.data;
