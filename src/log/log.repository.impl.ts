@@ -20,15 +20,9 @@ export class LogRepositoryImpl implements LogRepository {
     }
   }
 
-<<<<<<< HEAD
-  async read(): Promise<Result<LogEntity[]>> {
-    try {
-      const logs = await this.service.read();
-=======
   async read(page: number, limit: number): Promise<Result<LogEntity[]>> {
     try {
       const logs = await this.service.read(page, limit);
->>>>>>> features/logs
       return success(logs);
     } catch (error) {
       console.error(error);
