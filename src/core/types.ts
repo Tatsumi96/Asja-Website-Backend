@@ -27,4 +27,8 @@ export type Branche =
 
 export type Tranche = 'Premier' | 'Deuxieme' | 'Troisieme';
 
+<<<<<<< HEAD
 export type Actions = 'Creation' | 'Suppression' | 'Modification';
+=======
+export type Action = 'Creation' | 'Suppression' | 'Modification';
+>>>>>>> features/logs

@@ -58,3 +58,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 /generated/prisma
 
 log.json
+<<<<<<< HEAD
+=======
+/student_pictures
+/files
+>>>>>>> features/logs
