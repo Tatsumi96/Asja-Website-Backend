@@ -4,7 +4,7 @@ import { PostRepositoryImpl } from './post.repository.impl';
 import {
   PostPrismaService,
   PostPrismaServiceImpl,
-} from './post.service..prisma';
+} from './post.service.prisma';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { PrismaModule } from '@/prisma/prisma.module';

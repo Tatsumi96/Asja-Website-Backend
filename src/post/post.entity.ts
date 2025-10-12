@@ -6,7 +6,7 @@ export interface PostEntity {
   branche: Branche;
   level: Level;
   mention: Mention;
-  fileName?: string;
+  imageUrl?: string | undefined;
 }
 
 export interface GetPostInputType {

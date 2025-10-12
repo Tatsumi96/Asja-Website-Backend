@@ -18,6 +18,8 @@ export class PostService {
   async createPost(post: PostEntity) {
     const result = await this.postRepository.create(post);
     if (result.status == 'failure') throw new BadRequestException();
+
+    return result.data;
   }
 
   async getPost(params: GetPostInputType) {

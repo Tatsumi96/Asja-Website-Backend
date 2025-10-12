@@ -4,7 +4,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { PostDto } from './post.dto';
 
 export abstract class PostPrismaService {
-  abstract create(post: PostEntity): Promise<void>;
+  abstract create(post: PostEntity): Promise<{ id: string; date: string }>;
   abstract get(params: GetPostInputType): Promise<PostDto[]>;
 }
 
@@ -12,21 +12,25 @@ export abstract class PostPrismaService {
 export class PostPrismaServiceImpl implements PostPrismaService {
   constructor(private prisma: PrismaService) {}
 
-  async create(post: PostEntity): Promise<void> {
+  async create(post: PostEntity): Promise<{ id: string; date: string }> {
     try {
-      await this.prisma.post.create({
+      const result = await this.prisma.post.create({
         data: {
           Mention: post.mention ?? 'ASJA',
           Titre: post.title,
           Niveau: post.level,
           Branche: post.branche,
           Description: post.description,
-          ...(post.fileName && {
-            Fichier: post.fileName,
+          ...(post.imageUrl && {
+            Fichier: post.imageUrl,
           }),
         },
+        select: { id: true, createdAt: true },
       });
-      return;
+      return {
+        id: result.id,
+        date: result.createdAt.toLocaleDateString('fr-FR'),
+      };
     } catch (error) {
       console.error(error);
       throw new Error();
@@ -59,8 +63,11 @@ export class PostPrismaServiceImpl implements PostPrismaService {
         id: item.id,
         description: item.Description,
         imageUrl: item.Fichier as string,
-        title: item.Titre as string,
+        title: item.Titre,
         date: item.createdAt.toLocaleDateString('fr-FR'),
+        branche: item.Branche,
+        level: item.Niveau,
+        mention: item.Mention,
       })) as PostDto[];
 
       return post;
