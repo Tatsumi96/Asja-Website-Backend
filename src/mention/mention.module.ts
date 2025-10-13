@@ -9,17 +9,16 @@ import { MentionRepository } from './mention.repository';
 import { MentionRepositoryImpl } from './mention.repositoryImpl';
 import { MentionService } from './mention.service';
 import { MentionController } from './mention.controller';
-import { FileRepository } from './fileRepository';
-import { FileRepositoryImpl } from './file_repositoryImpl';
+
+import { FileModule } from '@/file/file.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, FileModule.forFeature('./student_pictures/')],
   controllers: [MentionController],
   providers: [
     MentionService,
     { provide: MentionRepository, useClass: MentionRepositoryImpl },
     { provide: MentionPrismaService, useClass: MentionPrismaServiceImpl },
-    { provide: FileRepository, useClass: FileRepositoryImpl },
   ],
 })
 export class MentionModule {}

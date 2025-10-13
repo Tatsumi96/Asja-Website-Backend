@@ -6,13 +6,16 @@ import { UserEntity } from './user.entity';
 import { MentionDto } from './mention.dto';
 import { Branche, Level, Mention } from '@/core/types';
 import { UserDto } from './user.dto';
+import { RegisterReturnType } from './registerReturnType';
 
 export abstract class MentionPrismaService {
   abstract getMentionData(): Promise<MentionDto>;
   abstract getStudentData(page: number, limit: number): Promise<UserDto[]>;
 
-  abstract register(user: UserEntity): Promise<void>;
+  abstract register(user: UserEntity): Promise<RegisterReturnType>;
   abstract deleteStudent(id: string): Promise<void>;
+
+  abstract searchStudent(query: string): Promise<UserDto[]>;
 }
 
 @Injectable()
@@ -26,9 +29,9 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
         PROCESSUEL: 'PROCESSUEL',
       },
       INFORMATIQUE: {
-        TCO: 'TCO',
-        GL: 'GL',
-        GI: 'GI',
+        TELECOMMUNICATION: 'TELECOMMUNICATION',
+        'GENIE LOGICIEL': 'GENIE_LOGICIEL',
+        'GENIE INDUSTRIEL': 'GENIE_INDUSTRIEL',
       },
       'SCIENCE DE LA TERRE': {
         HYDROGEOLOGIE: 'HYDROGEOLOGIE',
@@ -51,9 +54,9 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
 
   private shouldIncludeBranch(branche: string, level: Level): boolean {
     const l3PlusBranches: Branche[] = [
-      'GL',
-      'GI',
-      'TCO',
+      'GENIE LOGICIEL',
+      'GENIE INDUSTRIEL',
+      'TELECOMMUNICATION',
       'AFFAIRES',
       'PROCESSUEL',
       'HYDROGEOLOGIE',
@@ -149,11 +152,11 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
     return result as MentionDto;
   }
 
-  async register(user: UserEntity): Promise<void> {
-    if (user.role == 'User') await this.registerStudent(user);
+  async register(user: UserEntity): Promise<RegisterReturnType> {
+    return this.registerStudent(user);
   }
 
-  async registerStudent(user: UserEntity): Promise<void> {
+  async registerStudent(user: UserEntity): Promise<RegisterReturnType> {
     let randomId = this.generateRandomId();
     let isExist = await this.isStudentIdExist(randomId);
     while (isExist) {
@@ -161,7 +164,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
       isExist = await this.isStudentIdExist(randomId);
     }
 
-    await this.prisma.mention.create({
+    const result = await this.prisma.mention.create({
       data: {
         Branche: user.branche,
         Niveau: user.level as string,
@@ -184,7 +187,21 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
           },
         },
       },
+      select: {
+        id: true,
+      },
     });
+
+    const trancheId = await this.prisma.tranche.findFirst({
+      where: { studentMatricule: randomId },
+      select: { id: true },
+    });
+
+    return {
+      mentionId: result.id,
+      trancheId: trancheId?.id as string,
+      identifier: randomId,
+    };
   }
 
   async isStudentIdExist(randomId: number): Promise<boolean | undefined> {
@@ -246,7 +263,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
         mention: student.Classe.Mention as Mention,
         contact: student.contact,
         identifier: student.Matricule,
-        imageUrl: student.filePictureName as string,
+        fileName: student.filePictureName as string,
         mentionId: mentionId?.MentionId as string,
         trancheId: trancheId?.id as string,
         Premier: trancheOne?.Premier as boolean,
@@ -262,5 +279,74 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
     await this.prisma.mention.delete({
       where: { id },
     });
+  }
+
+  async searchStudent(query: string): Promise<UserDto[]> {
+    const result: {
+      Matricule: number;
+      Nom: string;
+      Prenom: string;
+      contact: string;
+      filePictureName: string;
+      MentionId: string;
+    }[] = await this.prisma.$queryRawUnsafe(
+      `SELECT "Matricule","Nom","Prenom","contact","filePictureName","MentionId" FROM "Student"
+     WHERE "Nom" ILIKE '%' || $1 || '%'
+        OR "Prenom" ILIKE '%' || $1 || '%'
+        OR SIMILARITY("Nom", $1) > 0.3 
+        OR SIMILARITY("Prenom", $1) > 0.3
+     ORDER BY GREATEST(SIMILARITY("Nom", $1), SIMILARITY("Prenom", $1)) DESC
+     LIMIT 5;`,
+      query,
+    );
+
+    const data: UserDto[] = [];
+
+    for (const student of result) {
+      const resultMention = await this.prisma.mention.findFirst({
+        where: { id: student.MentionId },
+        select: {
+          Branche: true,
+          Niveau: true,
+          Mention: true,
+        },
+      });
+
+      const trancheOne = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Premier: true },
+      });
+      const trancheTwo = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Deuxieme: true },
+      });
+      const trancheThree = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { Troisieme: true },
+      });
+
+      const trancheId = await this.prisma.tranche.findFirst({
+        where: { studentMatricule: student.Matricule },
+        select: { id: true },
+      });
+
+      data.push({
+        name: student.Nom,
+        lastName: student.Prenom,
+        branche: resultMention?.Branche as Branche,
+        level: resultMention?.Niveau as Level,
+        mention: resultMention?.Mention as Mention,
+        contact: student.contact,
+        identifier: student.Matricule,
+        fileName: student.filePictureName,
+        mentionId: student.MentionId,
+        trancheId: trancheId?.id as string,
+        Premier: trancheOne?.Premier as boolean,
+        Deuxieme: trancheTwo?.Deuxieme as boolean,
+        Troisieme: trancheThree?.Troisieme as boolean,
+      });
+    }
+
+    return data;
   }
 }

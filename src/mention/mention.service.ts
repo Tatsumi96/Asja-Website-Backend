@@ -6,8 +6,8 @@ import {
 import * as argon from 'argon2';
 import { MentionRepository } from './mention.repository';
 import { UserEntity } from './user.entity';
-import { FileRepository } from './fileRepository';
-import { fileReturnedType } from './file_repositoryImpl';
+import { fileReturnedType } from '@/file/file.repository.Impl';
+import { FileRepository } from '@/file/file.repository';
 
 @Injectable()
 export class MentionService {
@@ -30,6 +30,13 @@ export class MentionService {
     return result.data;
   }
 
+  async searchStudent(query: string) {
+    const result = await this.mentionRepository.searchStudent(query);
+    if (result.status == 'failure') throw new BadRequestException();
+
+    return result.data;
+  }
+
   async callRegister(user: UserEntity) {
     const hashPassword = await argon.hash(user.password);
     const userToInsert: UserEntity = { ...user, password: hashPassword };
@@ -37,7 +44,7 @@ export class MentionService {
     const result = await this.mentionRepository.register(userToInsert);
 
     if (result.status == 'failure') throw new BadRequestException();
-    return { status: 'Success' };
+    return result.data;
   }
 
   async callGetFile(fileName: string) {
@@ -47,8 +54,13 @@ export class MentionService {
     return { mimeType: result.data.mimetype, stream: result.data.file };
   }
 
-  async deleteStudent(id: string) {
+  async deleteStudent(id: string, fileName: string) {
     const result = await this.mentionRepository.deleteStudent(id);
-    if (result.status == 'failure') throw new ForbiddenException();
+    if (result.status == 'failure')
+      throw new ForbiddenException('Erreur on delete student');
+    if (fileName == 'undefined') return;
+    const resultFile = await this.fileRepository.delete(fileName);
+    if (resultFile.status == 'failure')
+      throw new ForbiddenException('Error on delete file');
   }
 }

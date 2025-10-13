@@ -59,3 +59,16 @@ model Document {
   Classe   Mention? @relation(fields: [classeId], references: [id])
   classeId String?
 }
+
+model Post {
+  id          String @id @default(cuid())
+  Description String
+  Titre       String
+  Fichier     String?
+  Branche     String
+  Mention     String
+  Niveau      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+}

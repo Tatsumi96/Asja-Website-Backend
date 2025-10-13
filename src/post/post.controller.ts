@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -16,49 +15,51 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { MentionService } from './mention.service';
-import { AuthGuard } from '@nestjs/passport';
-import { UserEntity } from './user.entity';
+import { PostService } from './post.service';
+import { PostEntity } from './post.entity';
 
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { Request } from 'express';
+import { Branche, Level, Mention } from '@/core/types';
+import { AuthGuard } from '@nestjs/passport';
+
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
 
-@Controller('mention')
-export class MentionController {
-  constructor(private service: MentionService) {}
+import { FastifyReply, FastifyRequest } from 'fastify';
 
-  // @UseGuards(AuthGuard('jwt'))
-  @HttpCode(HttpStatus.OK)
-  @Get()
-  async callMentionData() {
-    return this.service.getMentionData();
+@Controller('post')
+export class PostController {
+  constructor(private service: PostService) {}
+
+  @Post()
+  async create(@Body() post: PostEntity) {
+    return this.service.createPost(post);
   }
 
-  // @UseGuards(AuthGuard('jwt'))
-  @HttpCode(HttpStatus.OK)
-  @Get('student')
-  async callStudentData(
+  @UseGuards(AuthGuard('jwt'))
+  @Get()
+  async get(
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
+    @Req() req: Request,
   ) {
-    return this.service.getStudentData(page, limit);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Get('student/:name')
-  async callSearchStudent(@Query('name') query: string) {
-    return this.service.searchStudent(query);
-  }
-
-  @Post('register')
-  async callRegister(@Body() user: UserEntity) {
-    return this.service.callRegister(user);
+    const userData = req.user as {
+      mention: Mention;
+      level: Level;
+      branche: Branche;
+    };
+    return this.service.getPost({
+      branche: userData.branche,
+      level: userData.level,
+      mention: userData.mention,
+      page: page,
+      limit: limit,
+    });
   }
 
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   @Post('payload')
-  @UseInterceptors(new FastifyUploadInterceptor({ dest: './student_pictures' }))
+  @UseInterceptors(new FastifyUploadInterceptor({ dest: './post_pictures' }))
   saveDocPayload(@Req() req: FastifyRequest) {
     if (!req.fileData) {
       throw new BadRequestException('No file uploaded');
@@ -71,7 +72,7 @@ export class MentionController {
         mimetype: req.fileData.mimetype,
         size: req.fileData.size,
         path: req.fileData.path,
-        url: `/student_pictures/${req.fileData.originalname}`,
+        url: `/post_pictures/${req.fileData.originalname}`,
       },
     };
   }
@@ -89,8 +90,10 @@ export class MentionController {
       reply.send(result.stream);
     } catch (error) {
       // Gestion des erreurs spécifiques
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === 'ENOENT') {
         throw new HttpException('Fichier non trouvé', HttpStatus.NOT_FOUND);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       } else if (error.code === 'EACCES') {
         throw new HttpException(
           'Permissions insuffisantes pour lire le fichier',
@@ -103,14 +106,5 @@ export class MentionController {
         );
       }
     }
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Delete()
-  async deleteStudent(
-    @Query('id') id: string,
-    @Query('fileName') fileName: string,
-  ) {
-    return this.service.deleteStudent(id, fileName);
   }
 }

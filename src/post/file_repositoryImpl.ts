@@ -12,7 +12,7 @@ export interface fileReturnedType {
 }
 
 export class FileRepositoryImpl implements FileRepository<fileReturnedType> {
-  private basePath = join(process.cwd(), 'student_pictures');
+  private basePath = join(process.cwd(), 'post_pictures');
 
   async get(fileName: string): Promise<Result<fileReturnedType>> {
     if (fileName.includes('..') || fileName.includes('/')) {
@@ -37,8 +37,10 @@ export class FileRepositoryImpl implements FileRepository<fileReturnedType> {
       return success({ mimetype: contentType, file: stream });
     } catch (error) {
       // Gestion des erreurs spécifiques
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === 'ENOENT') {
         throw new Error();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       } else if (error.code === 'EACCES') {
         throw new Error();
       } else {
