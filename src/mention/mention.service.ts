@@ -58,6 +58,7 @@ export class MentionService {
     const result = await this.mentionRepository.deleteStudent(id);
     if (result.status == 'failure')
       throw new ForbiddenException('Erreur on delete student');
+    if (fileName == 'undefined') return;
     const resultFile = await this.fileRepository.delete(fileName);
     if (resultFile.status == 'failure')
       throw new ForbiddenException('Error on delete file');
