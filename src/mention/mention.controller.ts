@@ -106,8 +106,11 @@ export class MentionController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Delete(':id')
-  async deleteStudent(@Query('id') id: string) {
-    return this.service.deleteStudent(id);
+  @Delete()
+  async deleteStudent(
+    @Query('id') id: string,
+    @Query('fileName') fileName: string,
+  ) {
+    return this.service.deleteStudent(id, fileName);
   }
 }

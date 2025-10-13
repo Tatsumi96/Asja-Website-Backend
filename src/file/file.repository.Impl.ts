@@ -1,24 +1,28 @@
 import { join } from 'path';
 import * as fs from 'fs';
 import * as fsPromises from 'fs/promises';
-import { Result, success } from '@/core/Result';
+import { failure, Result, success } from '@/core/Result';
 
 import * as mime from 'mime-types';
-import { FileRepository } from './fileRepository';
+import { FileRepository } from './file.repository';
+import { Injectable } from '@nestjs/common';
 
 export interface fileReturnedType {
   mimetype: any;
   file: fs.ReadStream;
 }
 
+@Injectable()
 export class FileRepositoryImpl implements FileRepository<fileReturnedType> {
-  private basePath = join(process.cwd(), 'student_pictures');
+  constructor(private readonly dirName: string) {}
 
   async get(fileName: string): Promise<Result<fileReturnedType>> {
+    const basePath = join(process.cwd(), this.dirName);
+
     if (fileName.includes('..') || fileName.includes('/')) {
       throw new Error();
     }
-    const filePath = join(this.basePath, fileName);
+    const filePath = join(basePath, fileName);
 
     try {
       await fsPromises.access(filePath, fs.constants.F_OK | fs.constants.R_OK);
@@ -46,6 +50,17 @@ export class FileRepositoryImpl implements FileRepository<fileReturnedType> {
       } else {
         throw new Error();
       }
+    }
+  }
+  async delete(fileName: string): Promise<Result<void>> {
+    const basePath = join(process.cwd(), this.dirName);
+
+    try {
+      await fsPromises.unlink(`${basePath + fileName}`);
+      return success(undefined);
+    } catch (error) {
+      console.error(error);
+      return failure(new Error());
     }
   }
 }

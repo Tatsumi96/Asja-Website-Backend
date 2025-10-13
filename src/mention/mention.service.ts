@@ -6,8 +6,8 @@ import {
 import * as argon from 'argon2';
 import { MentionRepository } from './mention.repository';
 import { UserEntity } from './user.entity';
-import { FileRepository } from './fileRepository';
-import { fileReturnedType } from './file_repositoryImpl';
+import { fileReturnedType } from '@/file/file.repository.Impl';
+import { FileRepository } from '@/file/file.repository';
 
 @Injectable()
 export class MentionService {
@@ -54,8 +54,12 @@ export class MentionService {
     return { mimeType: result.data.mimetype, stream: result.data.file };
   }
 
-  async deleteStudent(id: string) {
+  async deleteStudent(id: string, fileName: string) {
     const result = await this.mentionRepository.deleteStudent(id);
-    if (result.status == 'failure') throw new ForbiddenException();
+    if (result.status == 'failure')
+      throw new ForbiddenException('Erreur on delete student');
+    const resultFile = await this.fileRepository.delete(fileName);
+    if (resultFile.status == 'failure')
+      throw new ForbiddenException('Error on delete file');
   }
 }
