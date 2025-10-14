@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 
-import { LoginDto, LoginReturnType } from '@/auth/login_Dto';
+import { LoginDto, LoginReturnType } from '@/auth/login.dto';
 import { UserNotFoundException } from './exception';
 import { Branche, Level, Mention } from '@/core/types';
 
@@ -14,7 +17,7 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
   constructor(private readonly prisma: PrismaService) {}
 
   async signIn(loginData: LoginDto): Promise<LoginReturnType> {
-    if (loginData.role == 'User') {
+    if (loginData.role == 'Student') {
       const user = await this.prisma.student.findFirst({
         where: { Matricule: loginData.identifier },
         select: {
@@ -33,7 +36,17 @@ export class AuthPrismaServiceImpl implements AuthPrismaService {
         branche: user.Classe.Branche as Branche,
       };
     } else {
-      throw new Error();
+      const user = await this.prisma.administrateur.findFirst({
+        where: { identifiant: loginData.identifier },
+        select: { MotDePasse: true },
+      });
+      if (!user) throw new UserNotFoundException();
+
+      return {
+        identifier: loginData.identifier,
+        password: user?.MotDePasse,
+        role: loginData.role,
+      };
     }
   }
 }

@@ -1,4 +1,4 @@
-import { LoginDto, LoginReturnType } from '@/auth/login_Dto';
+import { LoginDto, LoginReturnType } from '@/auth/login.dto';
 import { Result } from '@/core/Result';
 
 export abstract class AuthRepository {

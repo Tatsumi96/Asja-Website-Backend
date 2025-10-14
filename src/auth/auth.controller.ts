@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
-import { LoginDto } from './login_Dto';
+import { LoginDto } from './login.dto';
 import { FastifyRequest } from 'fastify/types/request';
 
 @Controller('auth')

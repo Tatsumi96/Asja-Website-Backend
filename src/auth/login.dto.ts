@@ -19,7 +19,6 @@ export interface LoginReturnType {
   password: string;
   level?: Level;
   mention?: Mention;
-  branche: Branche;
+  branche?: Branche;
   role: Role;
-  grade?: string;
 }
