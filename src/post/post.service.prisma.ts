@@ -6,6 +6,7 @@ import { PostDto } from './post.dto';
 export abstract class PostPrismaService {
   abstract create(post: PostEntity): Promise<{ id: string; date: string }>;
   abstract get(params: GetPostInputType): Promise<PostDto[]>;
+  abstract delete(id: string): Promise<void>;
 }
 
 @Injectable()
@@ -75,5 +76,11 @@ export class PostPrismaServiceImpl implements PostPrismaService {
       console.error(error);
       throw new Error();
     }
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.post.delete({
+      where: { id },
+    });
   }
 }

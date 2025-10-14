@@ -8,17 +8,15 @@ import {
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { PrismaModule } from '@/prisma/prisma.module';
-import { FileRepository } from './fileRepository';
-import { FileRepositoryImpl } from './file_repositoryImpl';
+import { FileModule } from '@/file/file.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, FileModule.forFeature('./post_pictures/')],
   controllers: [PostController],
   providers: [
     PostService,
     { provide: PostRepository, useClass: PostRepositoryImpl },
     { provide: PostPrismaService, useClass: PostPrismaServiceImpl },
-    { provide: FileRepository, useClass: FileRepositoryImpl },
   ],
 })
 export class PostModule {}

@@ -7,4 +7,5 @@ export abstract class PostRepository {
     post: PostEntity,
   ): Promise<Result<{ id: string; date: string }>>;
   abstract get(params: GetPostInputType): Promise<Result<PostDto[]>>;
+  abstract delete(id: string): Promise<Result<void>>;
 }

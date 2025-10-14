@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { GetPostInputType, PostEntity } from './post.entity';
-import { FileRepository } from './fileRepository';
-import { fileReturnedType } from './file_repositoryImpl';
+import { FileRepository } from '@/file/file.repository';
+import { fileReturnedType } from '@/file/file.repository.Impl';
 
 @Injectable()
 export class PostService {
@@ -33,5 +33,15 @@ export class PostService {
     if (result.status == 'failure') throw new ForbiddenException();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return { mimeType: result.data.mimetype, stream: result.data.file };
+  }
+
+  async delete(id: string, fileName: string) {
+    const result = await this.postRepository.delete(id);
+    if (result.status == 'failure')
+      throw new ForbiddenException('Erreur on delete student');
+    if (fileName == 'undefined') return;
+    const resultFile = await this.fileRepository.delete(fileName);
+    if (resultFile.status == 'failure')
+      throw new ForbiddenException('Error on delete file');
   }
 }

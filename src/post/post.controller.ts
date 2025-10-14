@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -106,5 +107,11 @@ export class PostController {
         );
       }
     }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Delete()
+  async delete(@Query('id') id: string, @Query('fileName') fileName: string) {
+    return this.service.delete(id, fileName);
   }
 }
