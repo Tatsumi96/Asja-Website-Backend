@@ -49,6 +49,13 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) reply: FastifyReply) {
+    reply.clearCookie('access_token', { path: '/' });
+    reply.clearCookie('refresh_token', { path: '/' });
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Post('refresh')
   async refresh(
     @Req() req: FastifyRequest,
