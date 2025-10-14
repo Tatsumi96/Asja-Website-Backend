@@ -1,4 +1,4 @@
-import { Branche, Level, Mention, Role } from '@/core/types';
+import { Branche, Level, Mention } from '@/core/types';
 
 export class UserEntity {
   matricule?: number;
@@ -6,7 +6,6 @@ export class UserEntity {
   lastName: string;
   password: string;
   contact: string;
-  role: Role;
   mention?: Mention;
   level?: Level;
   branche: Branche;

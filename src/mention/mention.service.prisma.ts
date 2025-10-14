@@ -176,6 +176,7 @@ export class MentionPrismaServiceImpl implements MentionPrismaService {
             Nom: user.name,
             Prenom: user.lastName,
             MotDePasse: user.password,
+            Role: 'Student',
             filePictureName: user.fileName,
             Tranche: {
               create: {
