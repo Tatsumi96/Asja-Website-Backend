@@ -23,7 +23,7 @@ import { DocService } from './doc.service';
 import { DocEntity } from './doc.entity';
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
 import { getDocFileInputType } from './doc.repository';
-import { Branche, Level, Mention } from '@/core/types';
+import { Branche, Level, Mention, Role } from '@/core/types';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('doc')
@@ -103,6 +103,7 @@ export class DocController {
       mention: Mention;
       level: Level;
       branche: Branche;
+      role: Role;
     };
     const params: getDocFileInputType = {
       page,
@@ -110,6 +111,7 @@ export class DocController {
       level: userData.level,
       mention: userData.mention,
       branche: userData.branche,
+      role: userData.role,
     };
 
     return this.service.getDocFile(params);

@@ -3,8 +3,8 @@ import { DocEntity } from './doc.entity';
 import { DocRepository, getDocFileInputType } from './doc.repository';
 
 import { Injectable } from '@nestjs/common';
-import { DocPrismaService } from './doc_prisma_service';
-import { DocDto } from './docDto';
+import { DocPrismaService } from './doc.prisma.service';
+import { DocDto } from './doc.dto';
 
 @Injectable()
 export class DocRepositoryImpl implements DocRepository {

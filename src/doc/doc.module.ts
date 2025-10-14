@@ -4,7 +4,7 @@ import { DocService } from './doc.service';
 import { DocRepository } from './doc.repository';
 import { DocRepositoryImpl } from './doc.repositoryImpl';
 import { PrismaModule } from '@/prisma/prisma.module';
-import { DocPrismaService, DocPrismaServiceImpl } from './doc_prisma_service';
+import { DocPrismaService, DocPrismaServiceImpl } from './doc.prisma.service';
 import { FileModule } from '@/file/file.module';
 
 @Module({

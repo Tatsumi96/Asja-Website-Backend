@@ -3,7 +3,7 @@ import { DocEntity } from './doc.entity';
 import { getDocFileInputType } from './doc.repository';
 
 import { Injectable } from '@nestjs/common';
-import { DocDto } from './docDto';
+import { DocDto } from './doc.dto';
 import { Branche, Level, Mention } from '@/core/types';
 
 export abstract class DocPrismaService {
@@ -47,13 +47,17 @@ export class DocPrismaServiceImpl implements DocPrismaService {
         take: params.limit,
         include: {
           Classe: {
-            where: {
-              AND: [
-                { Mention: params.mention },
-                { Niveau: params.level },
-                { Branche: params.branche },
-              ],
-            },
+            ...(params.role == 'Student'
+              ? {
+                  where: {
+                    AND: [
+                      { Mention: params.mention },
+                      { Niveau: params.level },
+                      { Branche: params.branche },
+                    ],
+                  },
+                }
+              : {}),
           },
         },
       });
