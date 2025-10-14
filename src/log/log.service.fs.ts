@@ -17,8 +17,9 @@ export class LogServiceFsImpl implements LogServiceFs {
   async write(log: LogEntity): Promise<void> {
     try {
       const data = await fsPromises.readFile(this.logFilePath, 'utf-8');
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const logs: any[] = data.trim() ? JSON.parse(data) : [];
+      const logs: LogEntity[] = data.trim()
+        ? (JSON.parse(data) as LogEntity[])
+        : ([] as LogEntity[]);
       logs.push(log);
 
       await fsPromises.writeFile(
@@ -26,6 +27,7 @@ export class LogServiceFsImpl implements LogServiceFs {
         JSON.stringify(logs, null, 2),
       );
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === 'ENOENT') {
         const logs = [log];
         await fsPromises.writeFile(
@@ -43,7 +45,7 @@ export class LogServiceFsImpl implements LogServiceFs {
       const data = await fsPromises.readFile(this.logFilePath, 'utf-8');
 
       if (!data.trim()) {
-        return []; // fichier vide = aucun log
+        return [];
       }
 
       const logs: LogEntity[] = JSON.parse(data) as LogEntity[];
