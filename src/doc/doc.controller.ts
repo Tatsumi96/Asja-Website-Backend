@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -112,5 +113,11 @@ export class DocController {
     };
 
     return this.service.getDocFile(params);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Delete()
+  async delete(@Query('id') id: string, @Query('fileName') fileName: string) {
+    return this.service.delete(id, fileName);
   }
 }

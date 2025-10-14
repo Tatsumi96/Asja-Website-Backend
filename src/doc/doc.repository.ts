@@ -12,6 +12,7 @@ export interface getDocFileInputType {
 }
 
 export abstract class DocRepository {
-  abstract save(doc: DocEntity): Promise<Result<void>>;
+  abstract save(doc: DocEntity): Promise<Result<{ id: string }>>;
   abstract get(params: getDocFileInputType): Promise<Result<DocDto[]>>;
+  abstract delete(id: string): Promise<Result<void>>;
 }

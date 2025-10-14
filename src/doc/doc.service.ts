@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { DocRepository, getDocFileInputType } from './doc.repository';
 import { DocEntity } from './doc.entity';
-import { FileRepository } from './fileRepository';
-import { fileReturnedType } from './file_repositoryImpl';
+import { FileRepository } from '@/file/file.repository';
+import { fileReturnedType } from '@/file/file.repository.Impl';
 
 @Injectable()
 export class DocService {
@@ -18,6 +18,7 @@ export class DocService {
   async saveDocMetaData(doc: DocEntity) {
     const result = await this.docRepositoy.save(doc);
     if (result.status == 'failure') throw new BadRequestException();
+    return result.data;
   }
 
   async getDocFile(params: getDocFileInputType) {
@@ -31,5 +32,15 @@ export class DocService {
     if (result.status == 'failure') throw new ForbiddenException();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return { mimeType: result.data.mimetype, stream: result.data.file };
+  }
+
+  async delete(id: string, fileName: string) {
+    const result = await this.docRepositoy.delete(id);
+    if (result.status == 'failure')
+      throw new ForbiddenException('Erreur on delete student');
+    if (fileName == 'undefined') return;
+    const resultFile = await this.fileRepository.delete(fileName);
+    if (resultFile.status == 'failure')
+      throw new ForbiddenException('Error on delete file');
   }
 }
