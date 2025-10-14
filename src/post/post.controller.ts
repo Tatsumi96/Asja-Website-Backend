@@ -31,6 +31,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 export class PostController {
   constructor(private service: PostService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() post: PostEntity) {
     return this.service.createPost(post);
@@ -80,7 +81,7 @@ export class PostController {
     };
   }
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Get('stream/:filename')
   async streamFile(
     @Param('filename') fileName: string,
@@ -111,6 +112,7 @@ export class PostController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Delete()
   async delete(@Query('id') id: string, @Query('fileName') fileName: string) {

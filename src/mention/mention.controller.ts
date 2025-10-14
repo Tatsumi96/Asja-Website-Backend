@@ -27,14 +27,14 @@ import { FastifyUploadInterceptor } from './fastifyInterceptor';
 export class MentionController {
   constructor(private service: MentionService) {}
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get()
   async callMentionData() {
     return this.service.getMentionData();
   }
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get('student')
   async callStudentData(
@@ -44,12 +44,14 @@ export class MentionController {
     return this.service.getStudentData(page, limit);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get('student/:name')
   async callSearchStudent(@Query('name') query: string) {
     return this.service.searchStudent(query);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('register')
   async callRegister(@Body() user: UserEntity) {
     return this.service.callRegister(user);
@@ -76,7 +78,7 @@ export class MentionController {
     };
   }
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Get('stream/:filename')
   async streamFile(
     @Param('filename') fileName: string,
@@ -104,7 +106,7 @@ export class MentionController {
       }
     }
   }
-
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Delete()
   async deleteStudent(

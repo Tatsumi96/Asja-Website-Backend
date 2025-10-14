@@ -117,6 +117,7 @@ export class DocController {
     return this.service.getDocFile(params);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Delete()
   async delete(@Query('id') id: string, @Query('fileName') fileName: string) {
