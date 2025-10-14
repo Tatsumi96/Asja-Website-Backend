@@ -4,7 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { DocModule } from './doc/doc.module';
-import { UserModule } from './user/user.module';
+import { StudentModule } from './student/student.module';
 import { MentionModule } from './mention/mention.module';
 import { TrancheModule } from './tranche/tranche.module';
 import { LogModule } from './log/log.module';
@@ -18,7 +18,7 @@ import { PostModule } from './post/post.module';
     }),
     AuthModule,
     DocModule,
-    UserModule,
+    StudentModule,
     MentionModule,
     TrancheModule,
     LogModule,
