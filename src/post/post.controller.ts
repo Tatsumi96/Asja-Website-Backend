@@ -20,7 +20,7 @@ import { PostService } from './post.service';
 import { PostEntity } from './post.entity';
 
 import { Request } from 'express';
-import { Branche, Level, Mention } from '@/core/types';
+import { Branche, Level, Mention, Role } from '@/core/types';
 import { AuthGuard } from '@nestjs/passport';
 
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
@@ -47,6 +47,7 @@ export class PostController {
       mention: Mention;
       level: Level;
       branche: Branche;
+      role: Role;
     };
     return this.service.getPost({
       branche: userData.branche,
@@ -54,6 +55,7 @@ export class PostController {
       mention: userData.mention,
       page: page,
       limit: limit,
+      role: userData.role,
     });
   }
 

@@ -1,4 +1,4 @@
-import { Branche, Level, Mention } from '@/core/types';
+import { Branche, Level, Mention, Role } from '@/core/types';
 
 export interface PostEntity {
   description: string;
@@ -15,4 +15,5 @@ export interface GetPostInputType {
   level: Level;
   branche: Branche;
   mention: Mention;
+  role: Role;
 }
