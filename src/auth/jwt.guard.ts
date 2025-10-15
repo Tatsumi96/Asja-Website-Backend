@@ -1,33 +1,44 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { JwtService } from '@nestjs/jwt';
 import {
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
+import { ConfigService } from '@nestjs/config';
 
-import { Request } from 'express';
-
+@Injectable()
 export class JwtGuard implements CanActivate {
-  constructor(private JwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const request = context.switchToHttp().getRequest<FastifyRequest>();
+    const token = this.extractTokenFromCookie(request);
+
     if (!token) {
       throw new UnauthorizedException();
     }
+
     try {
-      const payload = await this.JwtService.verifyAsync(token);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
       request['user'] = payload;
-    } catch {
+    } catch (e) {
       throw new UnauthorizedException();
     }
+
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+  private extractTokenFromCookie(request: FastifyRequest): string | undefined {
+    if (request.cookies && request.cookies.access_token) {
+      return request.cookies.access_token;
+    }
+    return undefined;
   }
 }

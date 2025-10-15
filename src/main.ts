@@ -28,7 +28,7 @@ const bootstrap = async () => {
   });
 
   app.enableCors({
-    origin: true,
+    origin: ['http://192.168.1.209:80', 'http://localhost'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,

@@ -20,7 +20,10 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(@Body() loginData: LoginDto, @Res() reply: FastifyReply) {
+  async signIn(
+    @Body() loginData: LoginDto,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
     const { status, token, payload } = await this.service.callSignIn(loginData);
     const refreshToken = await this.service.generateRefreshToken(payload);
 
@@ -30,22 +33,20 @@ export class AuthController {
     reply.setCookie('access_token', token, {
       httpOnly: true,
       secure: false,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: MINUTE_EXPIRATION,
-      domain: 'localhost',
     });
 
     reply.setCookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: DAYS_EXPIRATION,
-      domain: 'localhost',
     });
 
-    return reply.send({ status });
+    return { status };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -82,19 +83,18 @@ export class AuthController {
     reply.setCookie('access_token', newToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: MINUTE_EXPIRATION,
-      domain: 'localhost',
     });
 
     reply.setCookie('refresh_token', newRefreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: DAYS_EXPIRATION,
-      domain: 'localhost',
     });
+    return { status: 'ok' };
   }
 }
