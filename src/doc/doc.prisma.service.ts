@@ -45,20 +45,22 @@ export class DocPrismaServiceImpl implements DocPrismaService {
       const result = await this.prisma.document.findMany({
         skip: (params.page - 1) * params.limit,
         take: params.limit,
-        include: {
-          Classe: {
-            ...(params.role == 'Student'
-              ? {
-                  where: {
-                    AND: [
-                      { Mention: params.mention },
-                      { Niveau: params.level },
-                      { Branche: params.branche },
-                    ],
-                  },
-                }
-              : {}),
-          },
+        ...(params.role == 'Student'
+          ? {
+              where: {
+                AND: [
+                  { Classe: { Branche: params.branche ?? 'COMMUN' } },
+                  { Classe: { Mention: params.mention } },
+                  { Classe: { Niveau: params.level } },
+                ],
+              },
+            }
+          : {}),
+        select: {
+          Nom: true,
+          Titre: true,
+          id: true,
+          Classe: { select: { Branche: true, Mention: true, Niveau: true } },
         },
       });
       const docFile: DocDto[] = result.map((item) => ({
