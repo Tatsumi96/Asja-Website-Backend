@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
 import { LoginDto } from './login.dto';
@@ -76,6 +77,13 @@ export class AuthService {
     level: Level | undefined;
     branche: Branche;
   }> {
-    return this.jwtService.decode(token);
+    try {
+      return await this.jwtService.verifyAsync(token, {
+        secret: this.config.get('JWT_SECRET'),
+      });
+    } catch (e) {
+      console.error(e);
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }
