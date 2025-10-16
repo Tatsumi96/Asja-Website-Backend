@@ -2,9 +2,11 @@ import { PrismaService } from '@/prisma/prisma.service';
 import type { StudentDto } from './student.dto';
 import { Injectable } from '@nestjs/common';
 import { Branche, Level, Mention } from '@/core/types';
+import { UpdateDto } from './udpate.dto';
 
 export abstract class StudentPrismaService {
   abstract get(userId: number): Promise<StudentDto>;
+  abstract update(user: UpdateDto): Promise<void>;
 }
 
 @Injectable()
@@ -50,5 +52,23 @@ export class StudentPrismaServiceImpl implements StudentPrismaService {
       Deuxieme: resultDeuxieme?.Deuxieme as boolean,
       Troisieme: resultTroisieme?.Troisieme as boolean,
     };
+  }
+
+  async update(user: UpdateDto): Promise<void> {
+    await this.prisma.student.update({
+      where: { Matricule: user.identifier },
+      data: {
+        Nom: user.name,
+        Prenom: user.lastName,
+        ...(user.imageUrl && { filePictureName: user.imageUrl }),
+        Classe: {
+          update: {
+            Branche: user.branche,
+            Niveau: user.level,
+            Mention: user.mention,
+          },
+        },
+      },
+    });
   }
 }
