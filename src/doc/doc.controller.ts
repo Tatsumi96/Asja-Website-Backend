@@ -25,19 +25,22 @@ import { FastifyUploadInterceptor } from './fastifyInterceptor';
 import { getDocFileInputType } from './doc.repository';
 import { Branche, Level, Mention, Role } from '@/core/types';
 import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard, Roles } from '@/auth/role.guard';
 
 @Controller('doc')
 export class DocController {
   constructor(private service: DocService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
   @HttpCode(HttpStatus.CREATED)
   @Post('metadata')
   saveDocMetaData(@Body() doc: DocEntity) {
     return this.service.saveDocMetaData(doc);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
   @HttpCode(HttpStatus.CREATED)
   @Post('payload')
   @UseInterceptors(new FastifyUploadInterceptor({ dest: './files' }))
@@ -117,7 +120,8 @@ export class DocController {
     return this.service.getDocFile(params);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
   @HttpCode(HttpStatus.OK)
   @Delete()
   async delete(@Query('id') id: string, @Query('fileName') fileName: string) {

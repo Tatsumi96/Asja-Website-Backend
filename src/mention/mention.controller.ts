@@ -22,19 +22,20 @@ import { UserEntity } from './user.entity';
 
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
+import { RoleGuard, Roles } from '@/auth/role.guard';
 
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles('Admin')
 @Controller('mention')
 export class MentionController {
   constructor(private service: MentionService) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get()
   async callMentionData() {
     return this.service.getMentionData();
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get('student')
   async callStudentData(
@@ -44,20 +45,17 @@ export class MentionController {
     return this.service.getStudentData(page, limit);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get('student/:name')
   async callSearchStudent(@Query('name') query: string) {
     return this.service.searchStudent(query);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Post('register')
   async callRegister(@Body() user: UserEntity) {
     return this.service.callRegister(user);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   @Post('payload')
   @UseInterceptors(new FastifyUploadInterceptor({ dest: './student_pictures' }))
@@ -78,7 +76,6 @@ export class MentionController {
     };
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get('stream/:filename')
   async streamFile(
     @Param('filename') fileName: string,
@@ -106,7 +103,7 @@ export class MentionController {
       }
     }
   }
-  @UseGuards(AuthGuard('jwt'))
+
   @HttpCode(HttpStatus.OK)
   @Delete()
   async deleteStudent(

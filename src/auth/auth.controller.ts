@@ -36,6 +36,7 @@ export class AuthController {
       sameSite: 'lax',
       path: '/',
       maxAge: MINUTE_EXPIRATION,
+      domain: 'localhost',
     });
 
     reply.setCookie('refresh_token', refreshToken, {
@@ -43,6 +44,7 @@ export class AuthController {
       secure: false,
       sameSite: 'lax',
       path: '/',
+      domain: 'localhost',
       maxAge: DAYS_EXPIRATION,
     });
 
@@ -85,6 +87,7 @@ export class AuthController {
       secure: false,
       sameSite: 'lax',
       path: '/',
+      domain: 'localhost',
       maxAge: MINUTE_EXPIRATION,
     });
 
@@ -93,6 +96,7 @@ export class AuthController {
       secure: false,
       sameSite: 'lax',
       path: '/',
+      domain: 'localhost',
       maxAge: DAYS_EXPIRATION,
     });
     return { status: 'ok' };

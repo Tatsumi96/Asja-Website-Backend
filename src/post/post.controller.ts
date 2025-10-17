@@ -26,12 +26,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
 
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { RoleGuard, Roles } from '@/auth/role.guard';
 
 @Controller('post')
 export class PostController {
   constructor(private service: PostService) {}
 
   @UseGuards(AuthGuard('jwt'))
+  @Roles('Admin')
   @Post()
   async create(@Body() post: PostEntity) {
     return this.service.createPost(post);
@@ -61,6 +63,7 @@ export class PostController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Roles('Admin')
   @HttpCode(HttpStatus.CREATED)
   @Post('payload')
   @UseInterceptors(new FastifyUploadInterceptor({ dest: './post_pictures' }))
@@ -112,7 +115,8 @@ export class PostController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
   @HttpCode(HttpStatus.OK)
   @Delete()
   async delete(@Query('id') id: string, @Query('fileName') fileName: string) {

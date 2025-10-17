@@ -13,6 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { Branche, Level, Mention } from '@/core/types';
 import { UpdateDto } from './udpate.dto';
+import { RoleGuard, Roles } from '@/auth/role.guard';
 
 @Controller('student')
 export class StudentController {
@@ -31,7 +32,8 @@ export class StudentController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
   @Put()
   async callUpdate(@Body() user: UpdateDto) {
     return this.service.update(user);

@@ -38,7 +38,7 @@ export class PostService {
   async delete(id: string, fileName: string) {
     const result = await this.postRepository.delete(id);
     if (result.status == 'failure')
-      throw new ForbiddenException('Erreur on delete student');
+      throw new ForbiddenException('Erreur on delete post');
     if (fileName == 'undefined') return;
     const resultFile = await this.fileRepository.delete(fileName);
     if (resultFile.status == 'failure')
