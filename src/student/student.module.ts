@@ -8,9 +8,10 @@ import {
 import { StudentRepository } from './student.repository';
 import { StudentRepositoryImpl } from './student.repository.impl';
 import { StudentService } from './student.service';
+import { FileModule } from '@/file/file.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, FileModule.forFeature('./student_pictures/')],
   controllers: [StudentController],
   providers: [
     StudentService,
