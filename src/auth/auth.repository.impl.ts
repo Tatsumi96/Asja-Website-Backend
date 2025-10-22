@@ -1,7 +1,7 @@
 import { failure, Result, success } from '@/core/Result';
-import { AuthRepository } from './Auth_repository';
-import { LoginDto, LoginReturnType } from './login_Dto';
-import { AuthPrismaService } from './Auth_Prisma_Repository';
+import { AuthRepository } from './auth.repository';
+import { LoginDto, LoginReturnType } from './login.dto';
+import { AuthPrismaService } from './aut.service.prisma';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -10,6 +10,7 @@ export class AuthRepositoryImpl implements AuthRepository {
 
   async signIn(login: LoginDto): Promise<Result<LoginReturnType>> {
     try {
+      console.log(login);
       const result = await this.service.signIn(login);
       return success(result);
     } catch (error) {

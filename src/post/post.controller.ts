@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -19,17 +20,20 @@ import { PostService } from './post.service';
 import { PostEntity } from './post.entity';
 
 import { Request } from 'express';
-import { Branche, Level, Mention } from '@/core/types';
+import { Branche, Level, Mention, Role } from '@/core/types';
 import { AuthGuard } from '@nestjs/passport';
 
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
 
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { RoleGuard, Roles } from '@/auth/role.guard';
 
 @Controller('post')
 export class PostController {
   constructor(private service: PostService) {}
 
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('Admin')
   @Post()
   async create(@Body() post: PostEntity) {
     return this.service.createPost(post);
@@ -46,6 +50,7 @@ export class PostController {
       mention: Mention;
       level: Level;
       branche: Branche;
+      role: Role;
     };
     return this.service.getPost({
       branche: userData.branche,
@@ -53,10 +58,12 @@ export class PostController {
       mention: userData.mention,
       page: page,
       limit: limit,
+      role: userData.role,
     });
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Roles('Admin')
   @HttpCode(HttpStatus.CREATED)
   @Post('payload')
   @UseInterceptors(new FastifyUploadInterceptor({ dest: './post_pictures' }))
@@ -77,7 +84,7 @@ export class PostController {
     };
   }
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Get('stream/:filename')
   async streamFile(
     @Param('filename') fileName: string,
@@ -106,5 +113,13 @@ export class PostController {
         );
       }
     }
+  }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
+  @HttpCode(HttpStatus.OK)
+  @Delete()
+  async delete(@Query('id') id: string, @Query('fileName') fileName: string) {
+    return this.service.delete(id, fileName);
   }
 }

@@ -1,6 +1,16 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { LogService } from './log.service';
+import { RoleGuard, Roles } from '@/auth/role.guard';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles('Admin')
 @Controller('logs')
 export class LogController {
   constructor(private service: LogService) {}

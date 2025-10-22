@@ -3,25 +3,27 @@ import { DocEntity } from './doc.entity';
 import { getDocFileInputType } from './doc.repository';
 
 import { Injectable } from '@nestjs/common';
-import { DocDto } from './docDto';
+import { DocDto } from './doc.dto';
+import { Branche, Level, Mention } from '@/core/types';
 
 export abstract class DocPrismaService {
-  abstract save(doc: DocEntity): Promise<void>;
+  abstract save(doc: DocEntity): Promise<{ id: string }>;
   abstract get(params: getDocFileInputType): Promise<DocDto[]>;
+  abstract delete(id: string): Promise<void>;
 }
 
 @Injectable()
 export class DocPrismaServiceImpl implements DocPrismaService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async save(doc: DocEntity): Promise<void> {
+  async save(doc: DocEntity): Promise<{ id: string }> {
     try {
-      await this.prisma.document.create({
+      const result = await this.prisma.document.create({
         data: {
           Nom: doc.fileName,
           Titre: doc.lessonTitle,
           MegaByte: doc.fileSize,
-          Professeur: doc.authorName,
+          Professeur: '',
           Classe: {
             create: {
               Branche: doc.branche,
@@ -31,6 +33,7 @@ export class DocPrismaServiceImpl implements DocPrismaService {
           },
         },
       });
+      return { id: result.id };
     } catch (error) {
       console.error(error);
       throw new Error();
@@ -42,29 +45,42 @@ export class DocPrismaServiceImpl implements DocPrismaService {
       const result = await this.prisma.document.findMany({
         skip: (params.page - 1) * params.limit,
         take: params.limit,
-        include: {
-          Classe: {
-            where: {
-              AND: [
-                { Mention: params.mention },
-                { Niveau: params.level },
-                { Branche: params.branche },
-              ],
-            },
-          },
+        ...(params.role == 'Student'
+          ? {
+              where: {
+                AND: [
+                  { Classe: { Branche: params.branche ?? 'COMMUN' } },
+                  { Classe: { Mention: params.mention } },
+                  { Classe: { Niveau: params.level } },
+                ],
+              },
+            }
+          : {}),
+        select: {
+          Nom: true,
+          Titre: true,
+          id: true,
+          Classe: { select: { Branche: true, Mention: true, Niveau: true } },
         },
       });
       const docFile: DocDto[] = result.map((item) => ({
-        author: item.Professeur,
         fileName: item.Nom,
         lessonTitle: item.Titre,
-        fileSize: item.MegaByte,
         id: item.id,
+        mention: item.Classe?.Mention as Mention,
+        level: item.Classe?.Niveau as Level,
+        branche: item.Classe?.Branche as Branche,
       }));
       return docFile;
     } catch (error) {
       console.error(error);
       throw new Error();
     }
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.document.delete({
+      where: { id },
+    });
   }
 }

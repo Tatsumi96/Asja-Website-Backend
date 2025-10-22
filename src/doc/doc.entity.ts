@@ -1,12 +1,10 @@
 import { Branche, Level, Mention } from '@/core/types';
 
 export interface DocEntity {
-  id?: string;
-  lessonTitle: string;
   fileName: string;
+  lessonTitle: string;
   fileSize: number;
-  authorName: string;
-  mention: Mention;
   level: Level;
   branche: Branche;
+  mention: Mention;
 }

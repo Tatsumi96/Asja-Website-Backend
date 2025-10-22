@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -22,21 +23,24 @@ import { DocService } from './doc.service';
 import { DocEntity } from './doc.entity';
 import { FastifyUploadInterceptor } from './fastifyInterceptor';
 import { getDocFileInputType } from './doc.repository';
-import { Branche, Level, Mention } from '@/core/types';
+import { Branche, Level, Mention, Role } from '@/core/types';
 import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard, Roles } from '@/auth/role.guard';
 
 @Controller('doc')
 export class DocController {
   constructor(private service: DocService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
   @HttpCode(HttpStatus.CREATED)
   @Post('metadata')
   saveDocMetaData(@Body() doc: DocEntity) {
     return this.service.saveDocMetaData(doc);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
   @HttpCode(HttpStatus.CREATED)
   @Post('payload')
   @UseInterceptors(new FastifyUploadInterceptor({ dest: './files' }))
@@ -102,6 +106,7 @@ export class DocController {
       mention: Mention;
       level: Level;
       branche: Branche;
+      role: Role;
     };
     const params: getDocFileInputType = {
       page,
@@ -109,8 +114,17 @@ export class DocController {
       level: userData.level,
       mention: userData.mention,
       branche: userData.branche,
+      role: userData.role,
     };
 
     return this.service.getDocFile(params);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('Admin')
+  @HttpCode(HttpStatus.OK)
+  @Delete()
+  async delete(@Query('id') id: string, @Query('fileName') fileName: string) {
+    return this.service.delete(id, fileName);
   }
 }

@@ -1,4 +1,4 @@
-import { Branche, Level, Mention } from '@/core/types';
+import { Branche, Level, Mention, Role } from '@/core/types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -22,6 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     mention: Mention;
     level: Level;
     branche: Branche;
+    role: Role;
   }) {
     return payload;
   }

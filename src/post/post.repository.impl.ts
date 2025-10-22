@@ -29,4 +29,13 @@ export class PostRepositoryImpl implements PostRepository {
       return failure(new Error());
     }
   }
+  async delete(id: string): Promise<Result<void>> {
+    try {
+      await this.service.delete(id);
+      return success(undefined);
+    } catch (error) {
+      console.error(error);
+      return failure(new Error());
+    }
+  }
 }

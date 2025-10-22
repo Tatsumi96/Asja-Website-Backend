@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 
-import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { DocModule } from './doc/doc.module';
-import { UserModule } from './user/user.module';
-import { MentionModule } from './mention/mention.module';
-import { TrancheModule } from './tranche/tranche.module';
 import { LogModule } from './log/log.module';
+import { MentionModule } from './mention/mention.module';
 import { PostModule } from './post/post.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { StudentModule } from './student/student.module';
+import { TrancheModule } from './tranche/tranche.module';
 
 @Module({
   imports: [
@@ -16,9 +17,10 @@ import { PostModule } from './post/post.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AdminModule,
     AuthModule,
     DocModule,
-    UserModule,
+    StudentModule,
     MentionModule,
     TrancheModule,
     LogModule,

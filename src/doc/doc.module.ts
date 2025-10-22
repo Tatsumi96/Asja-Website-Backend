@@ -4,18 +4,16 @@ import { DocService } from './doc.service';
 import { DocRepository } from './doc.repository';
 import { DocRepositoryImpl } from './doc.repositoryImpl';
 import { PrismaModule } from '@/prisma/prisma.module';
-import { DocPrismaService, DocPrismaServiceImpl } from './doc_prisma_service';
-import { FileRepository } from './fileRepository';
-import { FileRepositoryImpl } from './file_repositoryImpl';
+import { DocPrismaService, DocPrismaServiceImpl } from './doc.prisma.service';
+import { FileModule } from '@/file/file.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, FileModule.forFeature('./files/')],
   controllers: [DocController],
   providers: [
     DocService,
     { provide: DocRepository, useClass: DocRepositoryImpl },
     { provide: DocPrismaService, useClass: DocPrismaServiceImpl },
-    { provide: FileRepository, useClass: FileRepositoryImpl },
   ],
 })
 export class DocModule {}

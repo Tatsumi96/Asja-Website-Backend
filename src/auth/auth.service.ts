@@ -2,9 +2,10 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { AuthRepository } from './Auth_repository';
-import { LoginDto } from './login_Dto';
+import { AuthRepository } from './auth.repository';
+import { LoginDto } from './login.dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -46,9 +47,9 @@ export class AuthService {
   async generateAccessToken(payload: {
     sub: number;
     role: Role;
-    mention: Mention | undefined;
-    level: Level | undefined;
-    branche: Branche;
+    mention?: Mention | undefined;
+    level?: Level | undefined;
+    branche?: Branche;
   }): Promise<string> {
     return this.jwtService.signAsync(payload, {
       expiresIn: '15m',
@@ -59,9 +60,9 @@ export class AuthService {
   async generateRefreshToken(payload: {
     sub: number;
     role: Role;
-    mention: Mention | undefined;
-    level: Level | undefined;
-    branche: Branche;
+    mention?: Mention | undefined;
+    level?: Level | undefined;
+    branche?: Branche;
   }): Promise<string> {
     return this.jwtService.signAsync(payload, {
       expiresIn: '7d',
@@ -76,6 +77,13 @@ export class AuthService {
     level: Level | undefined;
     branche: Branche;
   }> {
-    return this.jwtService.decode(token);
+    try {
+      return await this.jwtService.verifyAsync(token, {
+        secret: this.config.get('JWT_SECRET'),
+      });
+    } catch (e) {
+      console.error(e);
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }
